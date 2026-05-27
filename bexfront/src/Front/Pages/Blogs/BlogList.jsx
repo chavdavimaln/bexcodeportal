@@ -7,7 +7,7 @@ import React, {
 
 import { Link } from "react-router-dom";
 
-import BlogContents from "../../../Admin/Pages/Blogs/BlogContents";
+// import BlogContents from "../../../Admin/Pages/Blogs/BlogContents";
 
 const BlogList = () => {
 
@@ -54,7 +54,7 @@ const BlogList = () => {
     /* Merge Static + Dynamic Blogs */
     const allBlogs = [
         ...localBlogs,
-        ...BlogContents,
+        // ...BlogContents,
     ];
 
     /* Remove Duplicate IDs */

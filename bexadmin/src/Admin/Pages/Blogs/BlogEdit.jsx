@@ -1,26 +1,32 @@
-// Admin/Pages/Blogs/BlogAdd.jsx
+// Admin/Pages/Blogs/BlogEdit.jsx
 
 import React, {
+    useEffect,
+    useState,
     useMemo,
     useRef,
-    useState,
 } from "react";
 
-import { useNavigate } from "react-router-dom";
+import {
+    useNavigate,
+    useParams,
+} from "react-router-dom";
 
 import {
     Check,
     X,
 } from "lucide-react";
 
-import Header from "../../../Front/Components/Header/Header";
-import Footer from "../../../Front/Components/Footer/Footer";
+import Header from "../../../Admin/Components/Header/Header";
+import Footer from "../../../Admin/Components/Footer/Footer";
 
 import BlogContents from "./BlogContents";
 
 import JoditEditor from "jodit-react";
 
-const BlogAdd = () => {
+const BlogEdit = () => {
+
+    const { id } = useParams();
 
     const navigate = useNavigate();
 
@@ -33,6 +39,29 @@ const BlogAdd = () => {
     const categoryRef = useRef(null);
     const authorRef = useRef(null);
     const designationRef = useRef(null);
+
+    /* Form State */
+    const [form, setForm] =
+        useState({
+            title: "",
+            image: "",
+            date: "",
+            author: "",
+            designation: "",
+            content: "",
+        });
+
+    const [categoryInput, setCategoryInput] =
+        useState("");
+
+    const [categories, setCategories] =
+        useState([]);
+
+    const [message, setMessage] =
+        useState("");
+
+    const [errors, setErrors] =
+        useState({});
 
     /* Local Storage Blogs */
     const localBlogs = useMemo(() => {
@@ -141,30 +170,58 @@ const BlogAdd = () => {
         },
     }), []);
 
-    /* Form State */
-    const [form, setForm] =
-        useState({
-            title: "",
-            image: null,
-            date: new Date()
-                .toISOString()
-                .slice(0, 16),
-            author: "",
-            designation: "",
-            content: "",
-        });
+    /* Fetch Existing Blog */
+    useEffect(() => {
 
-    const [categoryInput, setCategoryInput] =
-        useState("");
+        const blogs =
+            JSON.parse(
+                localStorage.getItem(
+                    "blogContents"
+                )
+            ) || [];
 
-    const [categories, setCategories] =
-        useState([]);
+        const blog = blogs.find(
+            (item) =>
+                item.id ===
+                Number(id)
+        );
 
-    const [message, setMessage] =
-        useState("");
+        if (blog) {
 
-    const [errors, setErrors] =
-        useState({});
+            setForm({
+                title:
+                    blog.title || "",
+
+                image:
+                    blog.image || "",
+
+                date:
+                    blog.date || "",
+
+                author:
+                    blog.author || "",
+
+                designation:
+                    blog.designation || "",
+
+                content:
+                    blog.content || "",
+            });
+
+            setCategories(
+                Array.isArray(
+                    blog.category
+                )
+                    ? blog.category
+                    : blog.category
+                        ? [
+                            blog.category,
+                        ]
+                        : []
+            );
+        }
+
+    }, [id]);
 
     /* Normalize Text */
     const normalizeText = (
@@ -184,6 +241,9 @@ const BlogAdd = () => {
     const isDuplicateTitle =
         allBlogs.some(
             (blog) =>
+                blog.id !==
+                Number(id) &&
+
                 normalizeText(
                     blog.title
                 ) ===
@@ -410,7 +470,7 @@ const BlogAdd = () => {
         );
     };
 
-    /* Submit Blog */
+    /* Update Blog */
     const handleSubmit = (
         e
     ) => {
@@ -543,72 +603,59 @@ const BlogAdd = () => {
             return;
         }
 
-        const newBlog = {
-
-            id: Date.now(),
-
-            slug: form.title
-                .toLowerCase()
-                .trim()
-                .replace(
-                    /[^\w\s-]/g,
-                    ""
+        const blogs =
+            JSON.parse(
+                localStorage.getItem(
+                    "blogContents"
                 )
-                .replace(
-                    /\s+/g,
-                    "-"
-                ),
+            ) || [];
 
-            title:
-                form.title,
+        const updatedBlogs =
+            blogs.map((blog) =>
+                blog.id ===
+                    Number(id)
+                    ? {
+                        ...blog,
 
-            image:
-                form.image,
+                        ...form,
 
-            date:
-                form.date,
+                        id: Number(id),
 
-            category:
-                categories,
+                        slug: form.title
+                            .toLowerCase()
+                            .trim()
+                            .replace(
+                                /[^\w\s-]/g,
+                                ""
+                            )
+                            .replace(
+                                /\s+/g,
+                                "-"
+                            ),
 
-            author:
-                form.author,
-
-            designation:
-                form.designation,
-
-            content:
-                form.content,
-        };
+                        category:
+                            categories,
+                    }
+                    : blog
+            );
 
         try {
-
-            const oldBlogs =
-                JSON.parse(
-                    localStorage.getItem(
-                        "blogContents"
-                    )
-                ) || [];
-
-            oldBlogs.unshift(
-                newBlog
-            );
 
             localStorage.setItem(
                 "blogContents",
                 JSON.stringify(
-                    oldBlogs
+                    updatedBlogs
                 )
             );
 
             setMessage(
-                "Blog Added Successfully!"
+                "Blog Updated Successfully!"
             );
 
             setTimeout(() => {
 
                 navigate(
-                    "/blogs"
+                    "/admin/blogs"
                 );
 
             }, 1000);
@@ -635,7 +682,7 @@ const BlogAdd = () => {
                 <div className="max-w-[1000px] mx-auto bg-white rounded-[30px] border border-black/10 p-6 md:p-10 shadow-sm">
 
                     <h2 className="text-[28px] md:text-[38px] font-semibold mb-8">
-                        Add Blog
+                        Edit Blog
                     </h2>
 
                     <form
@@ -831,6 +878,7 @@ const BlogAdd = () => {
                                 Categories
                             </label>
 
+                            {/* Add Category */}
                             <div className="flex flex-col md:flex-row gap-3">
 
                                 <input
@@ -1223,7 +1271,7 @@ const BlogAdd = () => {
 
                         {/* Submit */}
                         <button className="w-full md:w-auto px-8 py-3 bg-red-600 text-white rounded-full font-medium hover:bg-black transition">
-                            Submit Blog
+                            Update Blog
                         </button>
 
                     </form>
@@ -1237,4 +1285,4 @@ const BlogAdd = () => {
     );
 };
 
-export default BlogAdd;
+export default BlogEdit;

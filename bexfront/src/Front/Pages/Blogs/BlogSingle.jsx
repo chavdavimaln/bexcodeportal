@@ -23,7 +23,7 @@ import Header from "../../Components/Header/Header";
 import Footer from "../../Components/Footer/Footer";
 
 /* Import Static Blogs */
-import BlogContents from "../../../Admin/Pages/Blogs/BlogContents";
+// import BlogContents from "../../../Admin/Pages/Blogs/BlogContents";
 
 const BlogSingle = () => {
 
@@ -40,7 +40,7 @@ const BlogSingle = () => {
     /* Merge Blogs */
     const allBlogs = [
         ...localBlogs,
-        ...BlogContents,
+        // ...BlogContents,
     ];
 
     /* Remove Duplicate IDs */

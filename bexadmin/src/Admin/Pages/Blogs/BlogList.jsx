@@ -9,8 +9,8 @@ import { Link } from "react-router-dom";
 
 import BlogContents from "./BlogContents";
 
-import Header from "../../../Front/Components/Header/Header";
-import Footer from "../../../Front/Components/Footer/Footer";
+import Header from "../../../Admin/Components/Header/Header";
+import Footer from "../../../Admin/Components/Footer/Footer";
 
 const BlogList = () => {
 
