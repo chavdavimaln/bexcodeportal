@@ -1,23 +1,112 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# =========================================================
+# Dependencies
+# =========================================================
 
-# dependencies
-/node_modules
-/.pnp
+# Ignore node_modules anywhere in project
+node_modules/
+
+# Yarn / PnP
+.pnp
 .pnp.js
 
-# testing
-/coverage
-
-# production
-/build
-
-# misc
-.DS_Store
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
+# Package manager logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+
+# =========================================================
+# Testing / Coverage
+# =========================================================
+
+coverage/
+.nyc_output/
+
+# =========================================================
+# Production / Build
+# =========================================================
+
+build/
+dist/
+out/
+
+# =========================================================
+# Environment Variables
+# =========================================================
+
+.env
+.env.*
+!.env.example
+
+# =========================================================
+# Cache / Temp
+# =========================================================
+
+.cache/
+.parcel-cache/
+.next/
+.vite/
+.eslintcache
+
+# =========================================================
+# TypeScript
+# =========================================================
+
+*.tsbuildinfo
+
+# =========================================================
+# IDE / Editor
+# =========================================================
+
+.vscode/
+.idea/
+
+# VS Code workspace files
+*.code-workspace
+
+# =========================================================
+# OS Files
+# =========================================================
+
+.DS_Store
+Thumbs.db
+
+# =========================================================
+# Logs
+# =========================================================
+
+logs/
+*.log
+
+# =========================================================
+# Optional Runtime Files
+# =========================================================
+
+*.pid
+*.seed
+*.pid.lock
+
+# =========================================================
+# Optional Uploads / Generated Files
+# =========================================================
+
+uploads/
+tmp/
+temp/
+
+# =========================================================
+# Monorepo Support
+# =========================================================
+
+# Ignore nested node_modules in:
+# bex/node_modules
+# bexadmin/node_modules
+# bexapi/node_modules
+# and any future folders automatically
+
+# =========================================================
+# Git
+# =========================================================
+
+# Prevent accidental commits of local git metadata
+**/.git
