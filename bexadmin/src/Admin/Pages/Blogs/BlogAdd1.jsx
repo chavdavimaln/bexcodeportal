@@ -1,4 +1,4 @@
-// Admin/Pages/Blogs/BlogAdd.jsx
+// Admin/Pages/Blogs/BlogAdd1.jsx
 
 import React, {
     useMemo,
@@ -13,13 +13,14 @@ import {
     X,
 } from "lucide-react";
 
-import AdminLayout from "../../Components/Layout/AdminLayout";
+import Header from "../../../Admin/Components/Header/Header";
+import Footer from "../../../Admin/Components/Footer/Footer";
 
 import BlogContents from "./BlogContents";
 
 import JoditEditor from "jodit-react";
 
-const BlogAdd = () => {
+const BlogAdd1 = () => {
 
     const navigate = useNavigate();
 
@@ -420,6 +421,7 @@ const BlogAdd = () => {
 
         const newErrors = {};
 
+        /* Title */
         if (
             form.title.trim() ===
             ""
@@ -433,6 +435,7 @@ const BlogAdd = () => {
             );
         }
 
+        /* Duplicate Title */
         else if (
             isDuplicateTitle
         ) {
@@ -445,6 +448,7 @@ const BlogAdd = () => {
             );
         }
 
+        /* Image */
         else if (
             !form.image
         ) {
@@ -457,6 +461,7 @@ const BlogAdd = () => {
             );
         }
 
+        /* Date */
         else if (
             form.date.trim() ===
             ""
@@ -470,6 +475,7 @@ const BlogAdd = () => {
             );
         }
 
+        /* Category */
         else if (
             categories.length ===
             0
@@ -483,6 +489,7 @@ const BlogAdd = () => {
             );
         }
 
+        /* Content */
         else if (
             form.content
                 .replace(
@@ -496,6 +503,7 @@ const BlogAdd = () => {
                 "Blog content is required.";
         }
 
+        /* Author */
         else if (
             form.author.trim() ===
             ""
@@ -509,6 +517,7 @@ const BlogAdd = () => {
             );
         }
 
+        /* Designation */
         else if (
             form.designation.trim() ===
             ""
@@ -599,7 +608,7 @@ const BlogAdd = () => {
             setTimeout(() => {
 
                 navigate(
-                    "/admin/blogs"
+                    "/blogs"
                 );
 
             }, 1000);
@@ -618,24 +627,16 @@ const BlogAdd = () => {
     };
 
     return (
-        <AdminLayout>
+        <>
+            <Header />
 
-            <div>
+            <section className="relative w-full px-6 md:px-12 2xl:px-14 py-10 md:py-14 bg-[#f8f8f8]">
 
-                <h1 className="text-[32px] font-semibold mb-8">
-                    Add Blog
-                </h1>
+                <div className="max-w-[1000px] mx-auto bg-white rounded-[30px] border border-black/10 p-6 md:p-10 shadow-sm">
 
-                <div
-                    className="
-                        bg-white
-                        border
-                        border-black/10
-                        rounded-[25px]
-                        p-6
-                        md:p-8
-                    "
-                >
+                    <h2 className="text-[28px] md:text-[38px] font-semibold mb-8">
+                        Add Blog
+                    </h2>
 
                     <form
                         onSubmit={
@@ -1221,10 +1222,11 @@ const BlogAdd = () => {
 
                 </div>
 
-            </div>
+            </section>
 
-        </AdminLayout>
+            <Footer />
+        </>
     );
 };
 
-export default BlogAdd;
+export default BlogAdd1;

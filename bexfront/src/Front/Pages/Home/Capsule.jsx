@@ -36,7 +36,7 @@ const Capsule = () => {
         ];
 
         const totalCapsules = 24;
-        const minPerRow = 3;
+        const minPerRow = 4;
         const maxPerRow = 4;
 
         let created = 0;

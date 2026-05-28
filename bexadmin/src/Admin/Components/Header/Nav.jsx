@@ -104,63 +104,63 @@ const Nav = () => {
 
             {/* Mobile Dropdown */}
             {menuOpen && (
-    <div className="lg:hidden fixed top-[78px] left-0 w-full z-[999] px-6">
-        <div className="bg-white shadow-xl rounded-2xl p-5 space-y-4 border border-gray-100">
+                <div className="lg:hidden fixed top-[78px] left-0 w-full z-[999] px-6">
+                    <div className="bg-white shadow-xl rounded-2xl p-5 space-y-4 border border-gray-100">
 
-            {/* Services */}
-            <div>
-                <button
-                    onClick={() => setServiceOpen(!serviceOpen)}
-                    className="w-full flex justify-between items-center font-medium text-black"
-                >
-                    Services <ChevronDown size={18} />
-                </button>
+                        {/* Services */}
+                        <div>
+                            <button
+                                onClick={() => setServiceOpen(!serviceOpen)}
+                                className="w-full flex justify-between items-center font-medium text-black"
+                            >
+                                Services <ChevronDown size={18} />
+                            </button>
 
-                {serviceOpen && (
-                    <div className="mt-3 ml-3 space-y-2">
+                            {serviceOpen && (
+                                <div className="mt-3 ml-3 space-y-2">
+                                    <Link
+                                        to="/virtual-assistant"
+                                        className="block text-gray-700"
+                                    >
+                                        Virtual Assistant
+                                    </Link>
+
+                                    <Link
+                                        to="/marketing-support"
+                                        className="block text-gray-700"
+                                    >
+                                        Marketing Support
+                                    </Link>
+
+                                    <Link
+                                        to="/accounting-services"
+                                        className="block text-gray-700"
+                                    >
+                                        Accounting Services
+                                    </Link>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Portfolio */}
                         <Link
-                            to="/virtual-assistant"
-                            className="block text-gray-700"
+                            to="/portfolio"
+                            className="block font-medium text-black"
                         >
-                            Virtual Assistant
+                            Portfolio
                         </Link>
 
+                        {/* Blogs */}
                         <Link
-                            to="/marketing-support"
-                            className="block text-gray-700"
+                            to="/blogs"
+                            className="block font-medium text-black"
                         >
-                            Marketing Support
+                            Blogs
                         </Link>
 
-                        <Link
-                            to="/accounting-services"
-                            className="block text-gray-700"
-                        >
-                            Accounting Services
-                        </Link>
                     </div>
-                )}
-            </div>
-
-            {/* Portfolio */}
-            <Link
-                to="/portfolio"
-                className="block font-medium text-black"
-            >
-                Portfolio
-            </Link>
-
-            {/* Blogs */}
-            <Link
-                to="/blogs"
-                className="block font-medium text-black"
-            >
-                Blogs
-            </Link>
-
-        </div>
-    </div>
-)}
+                </div>
+            )}
         </nav>
     );
 };

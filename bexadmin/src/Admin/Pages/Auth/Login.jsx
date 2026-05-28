@@ -35,7 +35,7 @@ const Login = () => {
 
         // Redirect to Home page after success
         setTimeout(() => {
-            navigate("/admin/blogs");
+            navigate("/admin");
         }, 1000);
     };
 
