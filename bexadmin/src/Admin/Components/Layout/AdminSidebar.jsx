@@ -1,23 +1,45 @@
 import React, { useState } from "react";
 
 import {
-    LayoutDashboard,
-    ChevronDown,
-    X,
+    Home,
     FileText,
-    // Folder,
-    Briefcase,
+    Users,
+    ChevronDown,
+    LayoutGrid,
 } from "lucide-react";
 
-import { Link } from "react-router-dom";
+import {
+    Link,
+    useLocation,
+} from "react-router-dom";
 
 const AdminSidebar = ({
     sidebarOpen,
     setSidebarOpen,
 }) => {
 
+    const location = useLocation();
+
+    /* Logged User */
+    const loggedUser =
+        JSON.parse(
+            localStorage.getItem(
+                "loggedUser"
+            )
+        ) || {};
+
     const [blogOpen, setBlogOpen] =
         useState(true);
+
+    const [userOpen, setUserOpen] =
+        useState(true);
+
+    /* Safe Role Check */
+    const isAdmin =
+        loggedUser?.role
+            ?.toLowerCase()
+            ?.trim() ===
+        "administrator";
 
     return (
         <>
@@ -27,7 +49,7 @@ const AdminSidebar = ({
                     className="
                         fixed
                         inset-0
-                        bg-black/50
+                        bg-black/40
                         z-[998]
                         lg:hidden
                     "
@@ -37,135 +59,256 @@ const AdminSidebar = ({
                 />
             )}
 
+            {/* Sidebar */}
             <aside
                 className={`
                     fixed
-                    top-[80px]
+                    top-[70px]
                     left-0
-                    h-[calc(100vh-80px)]
-                    w-[280px]
+                    h-[calc(100vh-70px)]
                     bg-white
                     border-r
                     border-black/10
-                    overflow-y-auto
                     z-[999]
                     transition-all
                     duration-300
+                    overflow-y-auto
 
                     ${sidebarOpen
-                        ? "translate-x-0"
-                        : "-translate-x-full lg:translate-x-0"
+                        ? `
+                                translate-x-0
+                              `
+                        : `
+                                -translate-x-full
+                                lg:translate-x-0
+                              `
                     }
+
+                    w-[280px]
                 `}
             >
 
-                {/* Mobile Close */}
-                <div className="flex justify-end p-4 lg:hidden">
-
-                    <button
-                        onClick={() =>
-                            setSidebarOpen(false)
-                        }
-                    >
-                        <X size={24} />
-                    </button>
-
-                </div>
-
-                <div className="px-5 pb-10 space-y-3">
+                <div className="p-5">
 
                     {/* Dashboard */}
                     <Link
                         to="/admin"
-                        className="
+                        className={`
                             flex
                             items-center
                             gap-3
                             px-4
                             py-3
                             rounded-xl
-                            hover:bg-[#f5f5f5]
-                        "
+                            mb-2
+                            transition
+
+                            ${location.pathname ===
+                                "/admin"
+                                ? `
+                                        bg-red-600
+                                        text-white
+                                      `
+                                : `
+                                        hover:bg-gray-100
+                                        text-black
+                                      `
+                            }
+                        `}
                     >
-                        <LayoutDashboard size={20} />
+                        <Home size={20} />
+
                         Dashboard
                     </Link>
 
                     {/* Blogs */}
-                    <div>
+                    <button
+                        onClick={() =>
+                            setBlogOpen(
+                                !blogOpen
+                            )
+                        }
+                        className="
+                            w-full
+                            flex
+                            items-center
+                            justify-between
+                            px-4
+                            py-3
+                            rounded-xl
+                            hover:bg-gray-100
+                            transition
+                        "
+                    >
 
-                        <button
-                            onClick={() =>
-                                setBlogOpen(
-                                    !blogOpen
-                                )
-                            }
-                            className="
-                                w-full
-                                flex
-                                items-center
-                                justify-between
-                                px-4
-                                py-3
-                                rounded-xl
-                                hover:bg-[#f5f5f5]
-                            "
-                        >
-                            <div className="flex items-center gap-3">
-                                <FileText size={20} />
-                                Blogs
-                            </div>
+                        <div className="flex items-center gap-3">
+                            <FileText size={20} />
 
-                            <ChevronDown
-                                size={18}
-                            />
-                        </button>
+                            Blogs
+                        </div>
 
-                        {blogOpen && (
-                            <div className="ml-10 mt-2 flex flex-col gap-2">
+                        <ChevronDown
+                            size={18}
+                            className={`transition ${blogOpen
+                                ? "rotate-180"
+                                : ""
+                                }`}
+                        />
 
-                                <Link
-                                    to="/admin/blogs"
-                                    className="text-[15px] hover:text-red-600"
-                                >
-                                    Blog List
-                                </Link>
+                    </button>
 
-                                <Link
-                                    to="/admin/blogs/add"
-                                    className="text-[15px] hover:text-red-600"
-                                >
-                                    Blog Add
-                                </Link>
+                    {blogOpen && (
+                        <div className="ml-4 mt-2 space-y-2">
 
-                                <Link
-                                    to="/admin/categories"
-                                    className="text-[15px] hover:text-red-600"
-                                >
-                                    Categories
-                                </Link>
+                            <Link
+                                to="/admin/blogs"
+                                className="
+                                    block
+                                    px-4
+                                    py-2
+                                    rounded-lg
+                                    hover:bg-gray-100
+                                    transition
+                                "
+                            >
+                                Blog List
+                            </Link>
 
-                            </div>
-                        )}
+                            <Link
+                                to="/admin/blogs/add"
+                                className="
+                                    block
+                                    px-4
+                                    py-2
+                                    rounded-lg
+                                    hover:bg-gray-100
+                                    transition
+                                "
+                            >
+                                Add Blog
+                            </Link>
 
-                    </div>
+                            <Link
+                                to="/admin/blogs/categories"
+                                className="
+                                    block
+                                    px-4
+                                    py-2
+                                    rounded-lg
+                                    hover:bg-gray-100
+                                    transition
+                                "
+                            >
+                                Categories
+                            </Link>
+
+                        </div>
+                    )}
 
                     {/* Services */}
                     <Link
                         to="/admin/services"
-                        className="
+                        className={`
                             flex
                             items-center
                             gap-3
                             px-4
                             py-3
                             rounded-xl
-                            hover:bg-[#f5f5f5]
-                        "
+                            mt-2
+                            transition
+
+                            ${location.pathname ===
+                                "/admin/services"
+                                ? `
+                                        bg-red-600
+                                        text-white
+                                      `
+                                : `
+                                        hover:bg-gray-100
+                                      `
+                            }
+                        `}
                     >
-                        <Briefcase size={20} />
+                        <LayoutGrid size={20} />
+
                         Services
                     </Link>
+
+                    {/* Users Section */}
+                    {isAdmin && (
+                        <>
+                            <button
+                                onClick={() =>
+                                    setUserOpen(
+                                        !userOpen
+                                    )
+                                }
+                                className="
+                                    w-full
+                                    flex
+                                    items-center
+                                    justify-between
+                                    px-4
+                                    py-3
+                                    rounded-xl
+                                    hover:bg-gray-100
+                                    mt-2
+                                    transition
+                                "
+                            >
+
+                                <div className="flex items-center gap-3">
+                                    <Users size={20} />
+
+                                    Users
+                                </div>
+
+                                <ChevronDown
+                                    size={18}
+                                    className={`transition ${userOpen
+                                        ? "rotate-180"
+                                        : ""
+                                        }`}
+                                />
+
+                            </button>
+
+                            {userOpen && (
+                                <div className="ml-4 mt-2 space-y-2">
+
+                                    <Link
+                                        to="/admin/users"
+                                        className="
+                                            block
+                                            px-4
+                                            py-2
+                                            rounded-lg
+                                            hover:bg-gray-100
+                                            transition
+                                        "
+                                    >
+                                        All Users
+                                    </Link>
+
+                                    <Link
+                                        to="/admin/users/add"
+                                        className="
+                                            block
+                                            px-4
+                                            py-2
+                                            rounded-lg
+                                            hover:bg-gray-100
+                                            transition
+                                        "
+                                    >
+                                        Add User
+                                    </Link>
+
+                                </div>
+                            )}
+                        </>
+                    )}
 
                 </div>
 

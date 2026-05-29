@@ -1,46 +1,43 @@
 import React from "react";
 
-import { Link } from "react-router-dom";
-
 const AdminFooter = () => {
-
+    const year =
+        new Date().getFullYear();
     return (
         <footer
             className="
-                bg-white
-                border-t
-                border-black/10
-                px-6
-                py-4
-                flex
-                flex-col
-                md:flex-row
-                justify-between
-                gap-3
-                text-[14px]
-            "
+            mt-10
+            border-t
+            border-black/10
+            pt-5
+            text-sm
+            text-gray-500
+            flex
+            justify-between
+            flex-wrap
+            gap-3
+        "
         >
 
             <p>
-                © 2026 Bexcode Services
+                © {year} Bexcode Services
             </p>
 
             <div className="flex gap-3">
 
-                <Link to="/">
+                <button>
                     Privacy Policy
-                </Link>
+                </button>
 
-                <span>|</span>
-
-                <Link to="/">
+                <button>
                     Terms
-                </Link>
+                </button>
 
             </div>
 
         </footer>
     );
+
 };
 
 export default AdminFooter;

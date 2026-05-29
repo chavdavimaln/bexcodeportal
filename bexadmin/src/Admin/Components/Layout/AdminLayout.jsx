@@ -1,48 +1,73 @@
-import React, { useState } from "react";
+import React, {
+    useState,
+    useEffect,
+} from "react";
+
+import {
+    useNavigate,
+} from "react-router-dom";
 
 import AdminNavbar from "./AdminNavbar";
 import AdminSidebar from "./AdminSidebar";
 import AdminFooter from "./AdminFooter";
 
-const AdminLayout = ({ children }) => {
+const AdminLayout = ({
+    children,
+}) => {
+
+    const navigate = useNavigate();
 
     const [sidebarOpen, setSidebarOpen] =
         useState(false);
 
-    return (
-        <div className="min-h-screen bg-[#f8f8f8]">
+    useEffect(() => {
 
-            {/* Navbar */}
+        const loggedUser =
+            localStorage.getItem(
+                "loggedUser"
+            );
+
+        if (!loggedUser) {
+            navigate("/admin/login");
+        }
+
+    }, [navigate]);
+
+    return (
+        <div className="bg-[#f8f8f8] min-h-screen">
+
             <AdminNavbar
-                setSidebarOpen={setSidebarOpen}
+                sidebarOpen={
+                    sidebarOpen
+                }
+                setSidebarOpen={
+                    setSidebarOpen
+                }
             />
 
-            {/* Body */}
-            <div className="flex pt-[80px]">
+            <AdminSidebar
+                sidebarOpen={
+                    sidebarOpen
+                }
+                setSidebarOpen={
+                    setSidebarOpen
+                }
+            />
 
-                {/* Sidebar */}
-                <AdminSidebar
-                    sidebarOpen={sidebarOpen}
-                    setSidebarOpen={setSidebarOpen}
-                />
+            <main
+                className="
+                    pt-[90px]
+                    lg:pl-[300px]
+                    px-4
+                    md:px-6
+                    pb-6
+                "
+            >
+                {children}
+            </main>
 
-                {/* Main */}
-                <main
-                    className="
-                        flex-1
-                        lg:ml-[280px]
-                        min-h-[calc(100vh-80px)]
-                        flex
-                        flex-col
-                    "
-                >
-                    <div className="flex-1 p-6 md:p-8">
-                        {children}
-                    </div>
-
-                    <AdminFooter />
-                </main>
-
+            <div className="lg:pl-[280px]">
+                <AdminFooter />
             </div>
 
         </div>
