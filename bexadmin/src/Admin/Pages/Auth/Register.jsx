@@ -14,65 +14,65 @@ const Register = () => {
 
     const [message, setMessage] = useState("");
 
-   const handleSubmit = (e) => {
-    e.preventDefault();
+    const handleSubmit = (e) => {
+        e.preventDefault();
 
-    const emailRegex =
-        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const emailRegex =
+            /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (form.fullName.trim() === "") {
-        setMessage("Enter full name.");
-        return;
-    }
+        if (form.fullName.trim() === "") {
+            setMessage("Enter full name.");
+            return;
+        }
 
-    if (!emailRegex.test(form.email)) {
-        setMessage("Invalid email.");
-        return;
-    }
+        if (!emailRegex.test(form.email)) {
+            setMessage("Invalid email.");
+            return;
+        }
 
-    if (form.password.length < 6) {
-        setMessage("Password minimum 6 characters.");
-        return;
-    }
+        if (form.password.length < 6) {
+            setMessage("Password minimum 6 characters.");
+            return;
+        }
 
-    if (form.password !== form.confirmPassword) {
-        setMessage("Passwords do not match.");
-        return;
-    }
+        if (form.password !== form.confirmPassword) {
+            setMessage("Passwords do not match.");
+            return;
+        }
 
-    if (!form.checked) {
-        setMessage("Please accept confirmation.");
-        return;
-    }
+        if (!form.checked) {
+            setMessage("Please accept confirmation.");
+            return;
+        }
 
-    let users =
-        JSON.parse(localStorage.getItem("users")) || [];
+        let users =
+            JSON.parse(localStorage.getItem("users")) || [];
 
-    const alreadyUser = users.find(
-        (item) => item.email === form.email
-    );
+        const alreadyUser = users.find(
+            (item) => item.email === form.email
+        );
 
-    if (alreadyUser) {
-        setMessage("Email already registered.");
-        return;
-    }
+        if (alreadyUser) {
+            setMessage("Email already registered.");
+            return;
+        }
 
-    const newUser = {
-        id: Date.now(),
-        fullName: form.fullName,
-        email: form.email,
-        password: form.password,
+        const newUser = {
+            id: Date.now(),
+            fullName: form.fullName,
+            email: form.email,
+            password: form.password,
+        };
+
+        users.push(newUser);
+
+        localStorage.setItem(
+            "users",
+            JSON.stringify(users)
+        );
+
+        setMessage("Registration successful.");
     };
-
-    users.push(newUser);
-
-    localStorage.setItem(
-        "users",
-        JSON.stringify(users)
-    );
-
-    setMessage("Registration successful.");
-};
 
     return (
         <section className="relative w-full flex items-center px-6 2xl:px-14 md:px-12 py-10 md:py-14 overflow-hidden">

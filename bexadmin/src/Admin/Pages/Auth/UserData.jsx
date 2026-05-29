@@ -1,12 +1,12 @@
 const UserData = [
     // {
     //     id: 1,
-    //     username: "vimalcoder",
-    //     firstName: "vimal",
+    //     username: "admin",
+    //     firstName: "Vimal",
     //     lastName: "Admin",
     //     email: "vimal@bexcodeservices.com",
     //     password: "123456",
-    //     role: "administrator",
+    //     role: "Administrator",
     //     profile:
     //         "https://i.pravatar.cc/300?img=12",
     // },
@@ -16,7 +16,7 @@ const UserData = [
     //     username: "blogger",
     //     firstName: "Blog",
     //     lastName: "Writer",
-    //     email: "blogger@bexcodeservices.com",
+    //     email: "blogger@gmail.com",
     //     password: "123456",
     //     role: "Blogger",
     //     profile:
