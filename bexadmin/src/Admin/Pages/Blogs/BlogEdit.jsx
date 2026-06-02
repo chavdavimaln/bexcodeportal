@@ -17,11 +17,8 @@ import {
     X,
 } from "lucide-react";
 
-import Header from "../../../Admin/Components/Header/Header";
-import Footer from "../../../Admin/Components/Footer/Footer";
-
+import AdminLayout from "../../Components/Layout/AdminLayout";
 import BlogContents from "./BlogContents";
-
 import JoditEditor from "jodit-react";
 
 const BlogEdit = () => {
@@ -675,60 +672,61 @@ const BlogEdit = () => {
 
     return (
         <>
-            <Header />
-
-            <section className="relative w-full px-6 md:px-12 2xl:px-14 py-10 md:py-14 bg-[#f8f8f8]">
-
-                <div className="max-w-[1000px] mx-auto bg-white rounded-[30px] border border-black/10 p-6 md:p-10 shadow-sm">
-
-                    <h2 className="text-[28px] md:text-[38px] font-semibold mb-8">
+            <AdminLayout>
+                <div>
+                    <h1 className="text-[28px] md:text-[38px] font-semibold mb-8">
                         Edit Blog
-                    </h2>
+                    </h1>
+                    <div className="bg-white
+                        border
+                        border-black/10
+                        rounded-[25px]
+                        p-6
+                        md:p-8">
+                        <form
+                            onSubmit={
+                                handleSubmit
+                            }
+                            className="space-y-6"
+                        >
 
-                    <form
-                        onSubmit={
-                            handleSubmit
-                        }
-                        className="space-y-6"
-                    >
+                            {/* Title */}
+                            <div>
 
-                        {/* Title */}
-                        <div>
+                                <label className="block text-sm font-medium mb-2">
+                                    Blog Title
+                                </label>
 
-                            <label className="block text-sm font-medium mb-2">
-                                Blog Title
-                            </label>
+                                <input
+                                    ref={
+                                        titleRef
+                                    }
+                                    type="text"
+                                    value={
+                                        form.title
+                                    }
+                                    onChange={(
+                                        e
+                                    ) => {
 
-                            <input
-                                ref={
-                                    titleRef
-                                }
-                                type="text"
-                                value={
-                                    form.title
-                                }
-                                onChange={(
-                                    e
-                                ) => {
-
-                                    setForm({
-                                        ...form,
-                                        title:
-                                            e.target
-                                                .value,
-                                    });
-
-                                    setErrors(
-                                        (
-                                            prev
-                                        ) => ({
-                                            ...prev,
+                                        setForm({
+                                            ...form,
                                             title:
-                                                "",
-                                        })
-                                    );
-                                }}
-                                className={`
+                                                e.target
+                                                    .value,
+                                        });
+
+                                        setErrors(
+                                            (
+                                                prev
+                                            ) => ({
+                                                ...prev,
+                                                title:
+                                                    "",
+                                            })
+                                        );
+                                    }}
+                                    className={`
                                     w-full
                                     border
                                     rounded-xl
@@ -736,235 +734,231 @@ const BlogEdit = () => {
                                     py-3
                                     outline-none
 
-                                    ${
-                                        errors.title
+                                    ${errors.title
                                             ? `
                                                 border-red-500
                                               `
                                             : `
                                                 border-black/10
                                               `
-                                    }
-                                `}
-                                placeholder="Enter Blog Title"
-                            />
-
-                            {errors.title && (
-                                <p className="text-red-500 text-sm mt-2">
-                                    {
-                                        errors.title
-                                    }
-                                </p>
-                            )}
-
-                        </div>
-
-                        {/* Image */}
-                        <div>
-
-                            <label className="block text-sm font-medium mb-2">
-                                Select Image
-                            </label>
-
-                            <input
-                                ref={
-                                    imageRef
-                                }
-                                type="file"
-                                accept="image/*"
-                                onChange={
-                                    handleImage
-                                }
-                                className={`
-                                    w-full
-                                    border
-                                    rounded-xl
-                                    px-4
-                                    py-3
-
-                                    ${
-                                        errors.image
-                                            ? `
-                                                border-red-500
-                                              `
-                                            : `
-                                                border-black/10
-                                              `
-                                    }
-                                `}
-                            />
-
-                            {errors.image && (
-                                <p className="text-red-500 text-sm mt-2">
-                                    {
-                                        errors.image
-                                    }
-                                </p>
-                            )}
-
-                            {form.image && (
-                                <img
-                                    src={
-                                        form.image
-                                    }
-                                    alt=""
-                                    className="mt-4 h-[180px] rounded-xl object-cover"
-                                />
-                            )}
-
-                        </div>
-
-                        {/* Date */}
-                        <div>
-
-                            <label className="block text-sm font-medium mb-2">
-                                Date & Time
-                            </label>
-
-                            <input
-                                ref={
-                                    dateRef
-                                }
-                                type="datetime-local"
-                                value={
-                                    form.date
-                                }
-                                onChange={(
-                                    e
-                                ) =>
-                                    setForm(
-                                        {
-                                            ...form,
-                                            date:
-                                                e
-                                                    .target
-                                                    .value,
                                         }
-                                    )
-                                }
-                                className={`
-                                    w-full
-                                    border
-                                    rounded-xl
-                                    px-4
-                                    py-3
-
-                                    ${
-                                        errors.date
-                                            ? `
-                                                border-red-500
-                                              `
-                                            : `
-                                                border-black/10
-                                              `
-                                    }
                                 `}
-                            />
+                                    placeholder="Enter Blog Title"
+                                />
 
-                            {errors.date && (
-                                <p className="text-red-500 text-sm mt-2">
-                                    {
-                                        errors.date
-                                    }
-                                </p>
-                            )}
+                                {errors.title && (
+                                    <p className="text-red-500 text-sm mt-2">
+                                        {
+                                            errors.title
+                                        }
+                                    </p>
+                                )}
 
-                        </div>
+                            </div>
 
-                        {/* Categories */}
-                        <div ref={categoryRef}>
+                            {/* Image */}
+                            <div>
 
-                            <label className="block text-sm font-medium mb-2">
-                                Categories
-                            </label>
-
-                            {/* Add Category */}
-                            <div className="flex flex-col md:flex-row gap-3">
+                                <label className="block text-sm font-medium mb-2">
+                                    Select Image
+                                </label>
 
                                 <input
-                                    type="text"
-                                    value={
-                                        categoryInput
+                                    ref={
+                                        imageRef
                                     }
-                                    onChange={(e) =>
-                                        setCategoryInput(
-                                            e.target.value
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={
+                                        handleImage
+                                    }
+                                    className={`
+                                    w-full
+                                    border
+                                    rounded-xl
+                                    px-4
+                                    py-3
+
+                                    ${errors.image
+                                            ? `
+                                                border-red-500
+                                              `
+                                            : `
+                                                border-black/10
+                                              `
+                                        }
+                                `}
+                                />
+
+                                {errors.image && (
+                                    <p className="text-red-500 text-sm mt-2">
+                                        {
+                                            errors.image
+                                        }
+                                    </p>
+                                )}
+
+                                {form.image && (
+                                    <img
+                                        src={
+                                            form.image
+                                        }
+                                        alt=""
+                                        className="mt-4 h-[180px] rounded-xl object-cover"
+                                    />
+                                )}
+
+                            </div>
+
+                            {/* Date */}
+                            <div>
+
+                                <label className="block text-sm font-medium mb-2">
+                                    Date & Time
+                                </label>
+
+                                <input
+                                    ref={
+                                        dateRef
+                                    }
+                                    type="datetime-local"
+                                    value={
+                                        form.date
+                                    }
+                                    onChange={(
+                                        e
+                                    ) =>
+                                        setForm(
+                                            {
+                                                ...form,
+                                                date:
+                                                    e
+                                                        .target
+                                                        .value,
+                                            }
                                         )
                                     }
                                     className={`
+                                    w-full
+                                    border
+                                    rounded-xl
+                                    px-4
+                                    py-3
+
+                                    ${errors.date
+                                            ? `
+                                                border-red-500
+                                              `
+                                            : `
+                                                border-black/10
+                                              `
+                                        }
+                                `}
+                                />
+
+                                {errors.date && (
+                                    <p className="text-red-500 text-sm mt-2">
+                                        {
+                                            errors.date
+                                        }
+                                    </p>
+                                )}
+
+                            </div>
+
+                            {/* Categories */}
+                            <div ref={categoryRef}>
+
+                                <label className="block text-sm font-medium mb-2">
+                                    Categories
+                                </label>
+
+                                {/* Add Category */}
+                                <div className="flex flex-col md:flex-row gap-3">
+
+                                    <input
+                                        type="text"
+                                        value={
+                                            categoryInput
+                                        }
+                                        onChange={(e) =>
+                                            setCategoryInput(
+                                                e.target.value
+                                            )
+                                        }
+                                        className={`
                                         w-full
                                         border
                                         rounded-xl
                                         px-4
                                         py-3
 
-                                        ${
-                                            errors.category
+                                        ${errors.category
                                                 ? `
                                                     border-red-500
                                                   `
                                                 : `
                                                     border-black/10
                                                   `
-                                        }
+                                            }
                                     `}
-                                    placeholder="Add New Category"
-                                />
+                                        placeholder="Add New Category"
+                                    />
 
-                                <button
-                                    type="button"
-                                    onClick={
-                                        addCategory
-                                    }
-                                    className="px-6 py-3 rounded-xl bg-red-600 text-white hover:bg-black transition"
-                                >
-                                    Add
-                                </button>
+                                    <button
+                                        type="button"
+                                        onClick={
+                                            addCategory
+                                        }
+                                        className="px-6 py-3 rounded-xl bg-red-600 text-white hover:bg-black transition"
+                                    >
+                                        Add
+                                    </button>
 
-                            </div>
+                                </div>
 
-                            {errors.category && (
-                                <p className="text-red-500 text-sm mt-2">
-                                    {
-                                        errors.category
-                                    }
-                                </p>
-                            )}
+                                {errors.category && (
+                                    <p className="text-red-500 text-sm mt-2">
+                                        {
+                                            errors.category
+                                        }
+                                    </p>
+                                )}
 
-                            {/* Existing Categories */}
-                            {categoryOptions.length >
-                                0 && (
-                                <div className="mt-5">
+                                {/* Existing Categories */}
+                                {categoryOptions.length >
+                                    0 && (
+                                        <div className="mt-5">
 
-                                    <h4 className="text-[15px] font-medium mb-3">
-                                        Select Categories
-                                    </h4>
+                                            <h4 className="text-[15px] font-medium mb-3">
+                                                Select Categories
+                                            </h4>
 
-                                    <div className="flex flex-wrap gap-3">
+                                            <div className="flex flex-wrap gap-3">
 
-                                        {categoryOptions.map(
-                                            (
-                                                item,
-                                                index
-                                            ) => {
+                                                {categoryOptions.map(
+                                                    (
+                                                        item,
+                                                        index
+                                                    ) => {
 
-                                                const isSelected =
-                                                    categories.includes(
-                                                        item
-                                                    );
-
-                                                return (
-                                                    <button
-                                                        key={
-                                                            index
-                                                        }
-                                                        type="button"
-                                                        onClick={() =>
-                                                            toggleCategory(
+                                                        const isSelected =
+                                                            categories.includes(
                                                                 item
-                                                            )
-                                                        }
-                                                        className={`
+                                                            );
+
+                                                        return (
+                                                            <button
+                                                                key={
+                                                                    index
+                                                                }
+                                                                type="button"
+                                                                onClick={() =>
+                                                                    toggleCategory(
+                                                                        item
+                                                                    )
+                                                                }
+                                                                className={`
                                                             flex
                                                             items-center
                                                             gap-2
@@ -974,71 +968,70 @@ const BlogEdit = () => {
                                                             border
                                                             transition
 
-                                                            ${
-                                                                isSelected
-                                                                    ? `
+                                                            ${isSelected
+                                                                        ? `
                                                                         bg-[#EA3C26]
                                                                         border-[#EA3C26]
                                                                         text-white
                                                                       `
-                                                                    : `
+                                                                        : `
                                                                         bg-[#f8f8f8]
                                                                         border-black/10
                                                                         text-black
                                                                         hover:border-[#EA3C26]
                                                                         hover:text-[#EA3C26]
                                                                       `
-                                                            }
+                                                                    }
                                                         `}
-                                                    >
+                                                            >
 
-                                                        {item}
+                                                                {item}
 
-                                                        {isSelected && (
-                                                            <Check
-                                                                size={
-                                                                    16
-                                                                }
-                                                            />
-                                                        )}
+                                                                {isSelected && (
+                                                                    <Check
+                                                                        size={
+                                                                            16
+                                                                        }
+                                                                    />
+                                                                )}
 
-                                                    </button>
-                                                );
-                                            }
-                                        )}
+                                                            </button>
+                                                        );
+                                                    }
+                                                )}
 
-                                    </div>
+                                            </div>
 
-                                </div>
-                            )}
+                                        </div>
+                                    )}
 
-                            {/* Added Categories */}
-                            {categories.length >
-                                0 && (
-                                <div className="mt-5">
+                                {/* Added Categories */}
+                                {categories.length >
+                                    0 && (
+                                        <div className="mt-5">
 
-                                    <h4 className="text-[15px] font-medium mb-3">
-                                        Added Categories
-                                    </h4>
+                                            <h4 className="text-[15px] font-medium mb-3">
+                                                Added Categories
+                                            </h4>
 
-                                    <div className="flex flex-wrap gap-3">
+                                            <div className="flex flex-wrap gap-3">
 
-                                        {categories.map(
-                                            (
-                                                item,
-                                                index
-                                            ) => (
-                                                <button
-                                                    key={
+                                                {categories.map(
+                                                    (
+                                                        item,
                                                         index
-                                                    }
-                                                    type="button"
-                                                    onClick={() =>
-                                                        removeCategory(
-                                                            item
-                                                        )
-                                                    }
-                                                    className="
+                                                    ) => (
+                                                        <button
+                                                            key={
+                                                                index
+                                                            }
+                                                            type="button"
+                                                            onClick={() =>
+                                                                removeCategory(
+                                                                    item
+                                                                )
+                                                            }
+                                                            className="
                                                         flex
                                                         items-center
                                                         gap-2
@@ -1051,236 +1044,230 @@ const BlogEdit = () => {
                                                         rounded-full
                                                         transition
                                                     "
-                                                >
+                                                        >
 
-                                                    {
-                                                        item
-                                                    }
+                                                            {
+                                                                item
+                                                            }
 
-                                                    <X
-                                                        size={
-                                                            16
-                                                        }
-                                                    />
+                                                            <X
+                                                                size={
+                                                                    16
+                                                                }
+                                                            />
 
-                                                </button>
-                                            )
-                                        )}
+                                                        </button>
+                                                    )
+                                                )}
 
-                                    </div>
+                                            </div>
 
-                                </div>
-                            )}
+                                        </div>
+                                    )}
 
-                        </div>
+                            </div>
 
-                        {/* Content */}
-                        <div>
+                            {/* Content */}
+                            <div>
 
-                            <label className="block text-sm font-medium mb-2">
-                                Blog Content
-                            </label>
+                                <label className="block text-sm font-medium mb-2">
+                                    Blog Content
+                                </label>
 
-                            <div
-                                className={`
+                                <div
+                                    className={`
                                     border
                                     rounded-xl
                                     overflow-hidden
                                     bg-white
 
-                                    ${
-                                        errors.content
+                                    ${errors.content
                                             ? `
                                                 border-red-500
                                               `
                                             : `
                                                 border-black/10
                                               `
-                                    }
+                                        }
                                 `}
-                            >
+                                >
 
-                                <JoditEditor
-                                    ref={
-                                        editor
-                                    }
-                                    value={
-                                        form.content
-                                    }
-                                    config={
-                                        config
-                                    }
-                                    tabIndex={1}
-                                    onChange={(
-                                        newContent
-                                    ) =>
-                                        setForm({
-                                            ...form,
-                                            content:
-                                                newContent,
-                                        })
-                                    }
-                                />
+                                    <JoditEditor
+                                        ref={
+                                            editor
+                                        }
+                                        value={
+                                            form.content
+                                        }
+                                        config={
+                                            config
+                                        }
+                                        tabIndex={1}
+                                        onChange={(
+                                            newContent
+                                        ) =>
+                                            setForm({
+                                                ...form,
+                                                content:
+                                                    newContent,
+                                            })
+                                        }
+                                    />
+
+                                </div>
+
+                                {errors.content && (
+                                    <p className="text-red-500 text-sm mt-2">
+                                        {
+                                            errors.content
+                                        }
+                                    </p>
+                                )}
 
                             </div>
 
-                            {errors.content && (
-                                <p className="text-red-500 text-sm mt-2">
+                            {/* Author */}
+                            <div className="grid md:grid-cols-2 gap-6">
+
+                                <div>
+
+                                    <label className="block text-sm font-medium mb-2">
+                                        Author Name
+                                    </label>
+
+                                    <input
+                                        ref={
+                                            authorRef
+                                        }
+                                        type="text"
+                                        value={
+                                            form.author
+                                        }
+                                        onChange={(
+                                            e
+                                        ) =>
+                                            setForm(
+                                                {
+                                                    ...form,
+                                                    author:
+                                                        e
+                                                            .target
+                                                            .value,
+                                                }
+                                            )
+                                        }
+                                        className={`
+                                        w-full
+                                        border
+                                        rounded-xl
+                                        px-4
+                                        py-3
+
+                                        ${errors.author
+                                                ? `
+                                                    border-red-500
+                                                  `
+                                                : `
+                                                    border-black/10
+                                                  `
+                                            }
+                                    `}
+                                        placeholder="Enter Name"
+                                    />
+
+                                    {errors.author && (
+                                        <p className="text-red-500 text-sm mt-2">
+                                            {
+                                                errors.author
+                                            }
+                                        </p>
+                                    )}
+
+                                </div>
+
+                                <div>
+
+                                    <label className="block text-sm font-medium mb-2">
+                                        Designation
+                                    </label>
+
+                                    <input
+                                        ref={
+                                            designationRef
+                                        }
+                                        type="text"
+                                        value={
+                                            form.designation
+                                        }
+                                        onChange={(
+                                            e
+                                        ) =>
+                                            setForm(
+                                                {
+                                                    ...form,
+                                                    designation:
+                                                        e
+                                                            .target
+                                                            .value,
+                                                }
+                                            )
+                                        }
+                                        className={`
+                                        w-full
+                                        border
+                                        rounded-xl
+                                        px-4
+                                        py-3
+
+                                        ${errors.designation
+                                                ? `
+                                                    border-red-500
+                                                  `
+                                                : `
+                                                    border-black/10
+                                                  `
+                                            }
+                                    `}
+                                        placeholder="Enter Designation"
+                                    />
+
+                                    {errors.designation && (
+                                        <p className="text-red-500 text-sm mt-2">
+                                            {
+                                                errors.designation
+                                            }
+                                        </p>
+                                    )}
+
+                                </div>
+
+                            </div>
+
+                            {/* Storage Error */}
+                            {errors.storage && (
+                                <p className="text-red-500 font-medium">
                                     {
-                                        errors.content
+                                        errors.storage
                                     }
                                 </p>
                             )}
 
-                        </div>
+                            {/* Success */}
+                            {message && (
+                                <p className="text-green-600 font-medium">
+                                    {message}
+                                </p>
+                            )}
 
-                        {/* Author */}
-                        <div className="grid md:grid-cols-2 gap-6">
+                            {/* Submit */}
+                            <button className="w-full md:w-auto px-8 py-3 bg-red-600 text-white rounded-full font-medium hover:bg-black transition">
+                                Update Blog
+                            </button>
 
-                            <div>
-
-                                <label className="block text-sm font-medium mb-2">
-                                    Author Name
-                                </label>
-
-                                <input
-                                    ref={
-                                        authorRef
-                                    }
-                                    type="text"
-                                    value={
-                                        form.author
-                                    }
-                                    onChange={(
-                                        e
-                                    ) =>
-                                        setForm(
-                                            {
-                                                ...form,
-                                                author:
-                                                    e
-                                                        .target
-                                                        .value,
-                                            }
-                                        )
-                                    }
-                                    className={`
-                                        w-full
-                                        border
-                                        rounded-xl
-                                        px-4
-                                        py-3
-
-                                        ${
-                                            errors.author
-                                                ? `
-                                                    border-red-500
-                                                  `
-                                                : `
-                                                    border-black/10
-                                                  `
-                                        }
-                                    `}
-                                    placeholder="Enter Name"
-                                />
-
-                                {errors.author && (
-                                    <p className="text-red-500 text-sm mt-2">
-                                        {
-                                            errors.author
-                                        }
-                                    </p>
-                                )}
-
-                            </div>
-
-                            <div>
-
-                                <label className="block text-sm font-medium mb-2">
-                                    Designation
-                                </label>
-
-                                <input
-                                    ref={
-                                        designationRef
-                                    }
-                                    type="text"
-                                    value={
-                                        form.designation
-                                    }
-                                    onChange={(
-                                        e
-                                    ) =>
-                                        setForm(
-                                            {
-                                                ...form,
-                                                designation:
-                                                    e
-                                                        .target
-                                                        .value,
-                                            }
-                                        )
-                                    }
-                                    className={`
-                                        w-full
-                                        border
-                                        rounded-xl
-                                        px-4
-                                        py-3
-
-                                        ${
-                                            errors.designation
-                                                ? `
-                                                    border-red-500
-                                                  `
-                                                : `
-                                                    border-black/10
-                                                  `
-                                        }
-                                    `}
-                                    placeholder="Enter Designation"
-                                />
-
-                                {errors.designation && (
-                                    <p className="text-red-500 text-sm mt-2">
-                                        {
-                                            errors.designation
-                                        }
-                                    </p>
-                                )}
-
-                            </div>
-
-                        </div>
-
-                        {/* Storage Error */}
-                        {errors.storage && (
-                            <p className="text-red-500 font-medium">
-                                {
-                                    errors.storage
-                                }
-                            </p>
-                        )}
-
-                        {/* Success */}
-                        {message && (
-                            <p className="text-green-600 font-medium">
-                                {message}
-                            </p>
-                        )}
-
-                        {/* Submit */}
-                        <button className="w-full md:w-auto px-8 py-3 bg-red-600 text-white rounded-full font-medium hover:bg-black transition">
-                            Update Blog
-                        </button>
-
-                    </form>
-
+                        </form>
+                    </div>
                 </div>
-
-            </section>
-
-            <Footer />
+            </AdminLayout>
         </>
     );
 };

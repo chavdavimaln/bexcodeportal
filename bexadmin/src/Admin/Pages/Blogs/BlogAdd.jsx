@@ -57,37 +57,44 @@ const BlogAdd = () => {
     }, [localBlogs]);
 
     /* Category Options */
+    // const categoryOptions =
+    //     useMemo(() => {
+
+    //         const allCategories =
+    //             allBlogs.flatMap(
+    //                 (blog) => {
+
+    //                     if (
+    //                         Array.isArray(
+    //                             blog.category
+    //                         )
+    //                     ) {
+    //                         return blog.category;
+    //                     }
+
+    //                     return blog.category
+    //                         ? [
+    //                             blog.category,
+    //                         ]
+    //                         : [];
+    //                 }
+    //             );
+
+    //         return [
+    //             ...new Set(
+    //                 allCategories
+    //             ),
+    //         ];
+
+    //     }, [allBlogs]);
     const categoryOptions =
-        useMemo(() => {
-
-            const allCategories =
-                allBlogs.flatMap(
-                    (blog) => {
-
-                        if (
-                            Array.isArray(
-                                blog.category
-                            )
-                        ) {
-                            return blog.category;
-                        }
-
-                        return blog.category
-                            ? [
-                                blog.category,
-                            ]
-                            : [];
-                    }
-                );
-
-            return [
-                ...new Set(
-                    allCategories
-                ),
-            ];
-
-        }, [allBlogs]);
-
+        JSON.parse(
+            localStorage.getItem(
+                "blogCategories"
+            )
+        )?.map(
+            (item) => item.name
+        ) || [];
     /* Editor Config */
     const config = useMemo(() => ({
         readonly: false,
@@ -636,7 +643,6 @@ const BlogAdd = () => {
                         md:p-8
                     "
                 >
-
                     <form
                         onSubmit={
                             handleSubmit
@@ -1218,11 +1224,8 @@ const BlogAdd = () => {
                         </button>
 
                     </form>
-
                 </div>
-
             </div>
-
         </AdminLayout>
     );
 };

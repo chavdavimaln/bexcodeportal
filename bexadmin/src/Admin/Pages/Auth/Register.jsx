@@ -16,7 +16,7 @@ const Register = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
+ 
         const emailRegex =
             /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 

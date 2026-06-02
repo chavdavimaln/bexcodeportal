@@ -14,11 +14,16 @@ import AdminRegister from "./Admin/Pages/Auth/Register";
 import BlogAdd from "./Admin/Pages/Blogs/BlogAdd";
 import BlogList from "./Admin/Pages/Blogs/BlogList";
 import BlogEdit from "./Admin/Pages/Blogs/BlogEdit";
+import Categories from "./Admin/Pages/Blogs/Categories";
+
+import BlogView from
+    "./Admin/Pages/Blogs/BlogView";
 
 import UserList from "./Admin/Pages/Users/UserList";
 import UserAdd from "./Admin/Pages/Users/UserAdd";
 import UserEdit from "./Admin/Pages/Users/UserEdit";
 import UserProfile from "./Admin/Pages/Users/UserProfile";
+
 
 function App() {
 
@@ -64,7 +69,10 @@ function App() {
                 path="/admin/blogs/edit/:id"
                 element={<BlogEdit />}
             />
-
+            <Route
+                path="/admin/blogs/view/:id"
+                element={<BlogView />}
+            />
             {/* Services */}
             <Route
                 path="/admin/services"
@@ -93,7 +101,10 @@ function App() {
                 path="/admin/users/profile"
                 element={<UserProfile />}
             />
-
+            <Route
+                path="/admin/blogs/categories"
+                element={<Categories />}
+            />
         </Routes>
     );
 }
