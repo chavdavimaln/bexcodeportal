@@ -4,7 +4,10 @@ import React, {
     useEffect,
     useState,
 } from "react";
-
+import {
+    Pencil,
+    Trash2,
+} from "lucide-react";
 import AdminLayout from "../../Components/Layout/AdminLayout";
 
 const Categories = () => {
@@ -336,19 +339,19 @@ const Categories = () => {
 
                                 <tr>
 
-                                    <th className="p-5 text-left">
+                                    <th className="p-5 text-left text-md">
                                         #
                                     </th>
 
-                                    <th className="p-5 text-left">
+                                    <th className="p-5 text-left text-md">
                                         Category
                                     </th>
 
-                                    <th className="p-5 text-left">
+                                    <th className="p-5 text-left text-md">
                                         Assigned Blogs
                                     </th>
 
-                                    <th className="p-5 text-left">
+                                    <th className="p-5 text-left text-md">
                                         Actions
                                     </th>
 
@@ -411,20 +414,21 @@ const Categories = () => {
 
                                                         <button
                                                             onClick={() =>
-                                                                handleEdit(
-                                                                    item
-                                                                )
+                                                                handleEdit(item)
                                                             }
                                                             className="
-                                                                px-4
-                                                                py-2
+                                                                w-8
+                                                                h-8
+                                                                rounded-full
                                                                 bg-black
                                                                 text-white
-                                                                rounded-lg
-                                                                text-sm
+                                                                flex
+                                                                items-center
+                                                                justify-center
                                                             "
+                                                            title="Edit"
                                                         >
-                                                            Edit
+                                                            <Pencil size={14} />
                                                         </button>
 
                                                         <button
@@ -434,15 +438,18 @@ const Categories = () => {
                                                                 )
                                                             }
                                                             className="
-                                                                px-4
-                                                                py-2
+                                                                w-8
+                                                                h-8
+                                                                rounded-full
                                                                 bg-red-600
                                                                 text-white
-                                                                rounded-lg
-                                                                text-sm
+                                                                flex
+                                                                items-center
+                                                                justify-center
                                                             "
+                                                            title="Delete"
                                                         >
-                                                            Delete
+                                                            <Trash2 size={14} />
                                                         </button>
 
                                                     </div>

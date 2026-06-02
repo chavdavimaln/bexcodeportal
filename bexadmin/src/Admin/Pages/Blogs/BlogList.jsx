@@ -355,7 +355,7 @@ const BlogList = () => {
                         {/* Search */}
                         <div className="lg:col-span-2">
 
-                            <label className="block text-sm font-medium mb-2">
+                            <label className="block text-md font-medium mb-2">
                                 Search
                             </label>
 
@@ -417,7 +417,7 @@ const BlogList = () => {
                         {/* Category */}
                         <div>
 
-                            <label className="block text-sm font-medium mb-2">
+                            <label className="block text-md font-medium mb-2">
                                 Category Filter
                             </label>
 
@@ -455,7 +455,7 @@ const BlogList = () => {
                         {/* Sort */}
                         <div>
 
-                            <label className="block text-sm font-medium mb-2">
+                            <label className="block text-md font-medium mb-2">
                                 Sort By
                             </label>
 
@@ -538,29 +538,29 @@ const BlogList = () => {
 
                     <div className="overflow-x-auto scrollbar-thin">
 
-                        <table className="w-full text-xs">
+                        <table className="w-full">
 
                             <thead className="bg-gray-50">
 
                                 <tr>
 
-                                    <th className="px-3 py-3 text-left text-[12px] font-semibold whitespace-nowrap">
+                                    <th className="px-3 py-3 text-left text-md font-medium whitespace-nowrap">
                                         Image
                                     </th>
 
-                                    <th className="px-3 py-3 text-left text-[12px] font-semibold whitespace-nowrap">
+                                    <th className="px-3 py-3 text-left text-md font-medium whitespace-nowrap">
                                         Title
                                     </th>
 
-                                    <th className="px-3 py-3 text-left text-[12px] font-semibold whitespace-nowrap">
+                                    <th className="px-3 py-3 text-left text-md font-medium whitespace-nowrap">
                                         Category
                                     </th>
 
-                                    <th className="px-3 py-3 text-left text-[12px] font-semibold whitespace-nowrap">
+                                    <th className="px-3 py-3 text-left text-md font-medium whitespace-nowrap">
                                         Date
                                     </th>
 
-                                    <th className="px-3 py-3 text-left text-[12px] font-semibold whitespace-nowrap">
+                                    <th className="px-3 py-3 text-left text-md font-medium whitespace-nowrap">
                                         Actions
                                     </th>
 
@@ -596,7 +596,7 @@ const BlogList = () => {
                                                     className="border-t"
                                                 >
 
-                                                    <td className="px-3 py-2 text-[12px]">
+                                                    <td className="px-3 py-2 text-[14px]">
 
                                                         <img
                                                             src={
@@ -613,13 +613,13 @@ const BlogList = () => {
 
                                                     </td>
 
-                                                    <td className="px-3 py-2 font-medium text-[12px] max-w-[220px]">
+                                                    <td className="px-3 py-2 font-medium text-[14px] max-w-[220px]">
                                                         {
                                                             blog.title
                                                         }
                                                     </td>
 
-                                                    <td className="px-3 py-2 text-[12px]">
+                                                    <td className="px-3 py-2 text-[14px]">
 
                                                         <span
                                                             className="
@@ -627,7 +627,7 @@ const BlogList = () => {
                                                                 py-1
                                                                 bg-gray-100
                                                                 rounded-full
-                                                                text-[11px]
+                                                                text-[14px]
                                                                 whitespace-nowrap
                                                             "
                                                         >
@@ -638,13 +638,13 @@ const BlogList = () => {
 
                                                     </td>
 
-                                                    <td className="px-3 py-2 text-[11px] whitespace-nowrap">
+                                                    <td className="px-3 py-2 text-[14px] whitespace-nowrap">
                                                         {
                                                             blog.date
                                                         }
                                                     </td>
-                                                   
-                                                    <td className="px-3 py-2 text-[12px]">
+
+                                                    <td className="px-3 py-2 text-[14px]">
 
                                                         <div className="flex items-center gap-1">
 

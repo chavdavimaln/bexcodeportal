@@ -4,6 +4,12 @@ import React, {
 } from "react";
 
 import {
+    Eye,
+    Pencil,
+    Trash2,
+} from "lucide-react";
+
+import {
     Link,
 } from "react-router-dom";
 
@@ -87,23 +93,23 @@ const UserList = () => {
                             <thead className="bg-[#f8f8f8]">
                                 <tr>
 
-                                    <th className="text-left p-5">
+                                    <th className="text-left p-3 text-md font-medium">
                                         Profile
                                     </th>
 
-                                    <th className="text-left p-5">
+                                    <th className="text-left p-3 text-md font-medium">
                                         Name
                                     </th>
 
-                                    <th className="text-left p-5">
+                                    <th className="text-left p-3 text-md font-medium">
                                         Email
                                     </th>
 
-                                    <th className="text-left p-5">
+                                    <th className="text-left p-3 text-md font-medium">
                                         Role
                                     </th>
 
-                                    <th className="text-left p-5">
+                                    <th className="text-left p-3 text-md font-medium">
                                         Actions
                                     </th>
 
@@ -121,22 +127,22 @@ const UserList = () => {
                                             className="border-t border-black/10"
                                         >
 
-                                            <td className="p-5">
+                                            <td className="p-3 text-[14px]">
                                                 <img
                                                     src={
                                                         user.profile
                                                     }
                                                     alt=""
                                                     className="
-                                                        w-14
-                                                        h-14
+                                                        w-10
+                                                        h-10
                                                         rounded-full
                                                         object-cover
                                                     "
                                                 />
                                             </td>
 
-                                            <td className="p-5">
+                                            <td className="p-3 text-[14px]">
                                                 {
                                                     user.firstName
                                                 }{" "}
@@ -145,44 +151,77 @@ const UserList = () => {
                                                 }
                                             </td>
 
-                                            <td className="p-5">
+                                            <td className="p-3 text-[14px]">
                                                 {
                                                     user.email
                                                 }
                                             </td>
 
-                                            <td className="p-5">
+                                            <td className="p-3 text-[14px]">
                                                 {
                                                     user.role
                                                 }
                                             </td>
 
-                                            <td className="p-5">
-                                                <div className="flex gap-3">
+                                            <td className="p-3">
+                                                <div className="flex items-center gap-2">
 
                                                     <Link
                                                         to={`/admin/users/profile/${user.id}`}
-                                                        className="px-4 py-2 rounded-full bg-black text-white"
+                                                        className="
+                                                                w-8
+                                                                h-8
+                                                                rounded-lg
+                                                                bg-blue-50
+                                                                text-blue-600
+                                                                flex
+                                                                items-center
+                                                                justify-center
+                                                                hover:bg-blue-600
+                                                                hover:text-white
+                                                                transition
+                                                            "
+                                                        title="View"
                                                     >
-                                                        View
+                                                        <Eye size={14} />
                                                     </Link>
 
                                                     <Link
                                                         to={`/admin/users/edit/${user.id}`}
-                                                        className="px-4 py-2 rounded-full bg-blue-600 text-white"
+                                                        className="
+                                                                w-8
+                                                                h-8
+                                                                rounded-lg
+                                                                bg-black
+                                                                text-white
+                                                                flex
+                                                                items-center
+                                                                justify-center
+                                                                hover:bg-gray-700
+                                                                transition
+                                                            "
+                                                        title="Edit"
                                                     >
-                                                        Edit
+                                                        <Pencil size={14} />
                                                     </Link>
 
                                                     <button
-                                                        onClick={() =>
-                                                            handleDelete(
-                                                                user.id
-                                                            )
-                                                        }
-                                                        className="px-4 py-2 rounded-full bg-red-600 text-white"
+                                                        onClick={() => handleDelete(user.id)}
+                                                        className="
+                                                                w-8
+                                                                h-8
+                                                                rounded-lg
+                                                                bg-red-600
+                                                                text-white
+                                                                flex
+                                                                items-center
+                                                                justify-center
+                                                                hover:bg-red-700
+                                                                transition
+                                                            "
+                                                        title="Delete"
                                                     >
-                                                        Delete
+                                                        <Trash2 size={14} />
                                                     </button>
 
                                                 </div>
