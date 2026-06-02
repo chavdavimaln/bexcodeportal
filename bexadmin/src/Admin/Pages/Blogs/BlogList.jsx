@@ -351,16 +351,15 @@ const BlogList = () => {
                     "
                 >
 
-                    <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
-
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                         {/* Search */}
-                        <div>
+                        <div className="lg:col-span-2">
 
                             <label className="block text-sm font-medium mb-2">
                                 Search
                             </label>
 
-                            <div className="flex gap-2">
+                            <div className="relative">
 
                                 <input
                                     type="text"
@@ -370,13 +369,24 @@ const BlogList = () => {
                                             e.target.value
                                         )
                                     }
-                                    placeholder="Search blogs..."
+                                    placeholder="
+                                        Search by title,
+                                        category,
+                                        author,
+                                        date,
+                                        year...
+                                    "
                                     className="
-                                        flex-1
+                                        w-full
                                         border
                                         rounded-xl
                                         px-4
                                         py-3
+                                        pr-12
+                                        text-sm
+                                        focus:outline-none
+                                        focus:ring-2
+                                        focus:ring-red-500/20
                                     "
                                 />
 
@@ -385,17 +395,18 @@ const BlogList = () => {
                                         type="button"
                                         onClick={clearSearch}
                                         className="
-                                        px-4
-                                        py-3
-                                        rounded-xl
-                                        border
-                                        border-red-500
-                                        text-red-600
-                                        hover:bg-red-50
-                                        transition
-                                    "
+                                            absolute
+                                            right-3
+                                            top-1/2
+                                            -translate-y-1/2
+                                            text-red-500
+                                            hover:text-red-700
+                                            transition
+                                            text-sm
+                                            font-medium
+                                        "
                                     >
-                                        Clear
+                                        ✕
                                     </button>
                                 )}
 
@@ -490,31 +501,28 @@ const BlogList = () => {
 
                         {/* Clear All */}
                         <div className="flex items-end">
-
                             <button
                                 type="button"
                                 onClick={clearFilters}
                                 className="
                                     w-full
+                                    h-[50px]
                                     px-5
-                                    py-3
                                     bg-gray-100
                                     border
                                     border-black/10
                                     rounded-xl
+                                    text-sm
                                     font-medium
                                     hover:bg-red-600
                                     hover:text-white
                                     transition
                                 "
                             >
-                                Reset All Filters
+                                Reset Filters
                             </button>
-
                         </div>
-
                     </div>
-
                 </div>
 
                 {/* Table */}
@@ -528,31 +536,31 @@ const BlogList = () => {
                     "
                 >
 
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto scrollbar-thin">
 
-                        <table className="w-full min-w-[1100px]">
+                        <table className="w-full text-xs">
 
                             <thead className="bg-gray-50">
 
                                 <tr>
 
-                                    <th className="p-5 text-left">
+                                    <th className="px-3 py-3 text-left text-[12px] font-semibold whitespace-nowrap">
                                         Image
                                     </th>
 
-                                    <th className="p-5 text-left">
+                                    <th className="px-3 py-3 text-left text-[12px] font-semibold whitespace-nowrap">
                                         Title
                                     </th>
 
-                                    <th className="p-5 text-left">
+                                    <th className="px-3 py-3 text-left text-[12px] font-semibold whitespace-nowrap">
                                         Category
                                     </th>
 
-                                    <th className="p-5 text-left">
+                                    <th className="px-3 py-3 text-left text-[12px] font-semibold whitespace-nowrap">
                                         Date
                                     </th>
 
-                                    <th className="p-5 text-left">
+                                    <th className="px-3 py-3 text-left text-[12px] font-semibold whitespace-nowrap">
                                         Actions
                                     </th>
 
@@ -588,7 +596,7 @@ const BlogList = () => {
                                                     className="border-t"
                                                 >
 
-                                                    <td className="p-5">
+                                                    <td className="px-3 py-2 text-[12px]">
 
                                                         <img
                                                             src={
@@ -596,30 +604,31 @@ const BlogList = () => {
                                                             }
                                                             alt=""
                                                             className="
-                                                                w-full
-                                                                h-17
-                                                                rounded-xl
+                                                                w-20
+                                                                h-14
+                                                                rounded-md
                                                                 object-cover
                                                             "
                                                         />
 
                                                     </td>
 
-                                                    <td className="p-5 font-medium">
+                                                    <td className="px-3 py-2 font-medium text-[12px] max-w-[220px]">
                                                         {
                                                             blog.title
                                                         }
                                                     </td>
 
-                                                    <td className="p-5">
+                                                    <td className="px-3 py-2 text-[12px]">
 
                                                         <span
                                                             className="
-                                                                px-3
+                                                                px-2
                                                                 py-1
                                                                 bg-gray-100
                                                                 rounded-full
-                                                                text-sm
+                                                                text-[11px]
+                                                                whitespace-nowrap
                                                             "
                                                         >
                                                             {
@@ -629,23 +638,23 @@ const BlogList = () => {
 
                                                     </td>
 
-                                                    <td className="p-5">
+                                                    <td className="px-3 py-2 text-[11px] whitespace-nowrap">
                                                         {
                                                             blog.date
                                                         }
                                                     </td>
+                                                   
+                                                    <td className="px-3 py-2 text-[12px]">
 
-                                                    <td className="p-5">
-
-                                                        <div className="flex items-center gap-2">
+                                                        <div className="flex items-center gap-1">
 
                                                             {/* Admin View */}
                                                             <Link
                                                                 to={`/admin/blogs/view/${blog.id}`}
                                                                 title="View Blog"
                                                                 className="
-                                                                    w-10
-                                                                    h-10
+                                                                    w-8
+                                                                    h-8
                                                                     rounded-lg
                                                                     bg-blue-50
                                                                     text-blue-600
@@ -657,7 +666,7 @@ const BlogList = () => {
                                                                     transition
                                                                 "
                                                             >
-                                                                <Eye size={18} />
+                                                                <Eye size={14} />
                                                             </Link>
 
                                                             {/* Front View */}
@@ -666,8 +675,8 @@ const BlogList = () => {
                                                                 target="_blank"
                                                                 title="Front View"
                                                                 className="
-                                                                    w-10
-                                                                    h-10
+                                                                    w-8
+                                                                    h-8
                                                                     rounded-lg
                                                                     bg-green-50
                                                                     text-green-600
@@ -679,7 +688,7 @@ const BlogList = () => {
                                                                     transition
                                                                 "
                                                             >
-                                                                <ExternalLink size={18} />
+                                                                <ExternalLink size={14} />
                                                             </Link>
 
                                                             {/* Edit */}
@@ -687,8 +696,8 @@ const BlogList = () => {
                                                                 to={`/admin/blogs/edit/${blog.id}`}
                                                                 title="Edit Blog"
                                                                 className="
-                                                                    w-10
-                                                                    h-10
+                                                                    w-8
+                                                                    h-8
                                                                     rounded-lg
                                                                     bg-black
                                                                     text-white
@@ -699,7 +708,7 @@ const BlogList = () => {
                                                                     transition
                                                                 "
                                                             >
-                                                                <Pencil size={18} />
+                                                                <Pencil size={14} />
                                                             </Link>
 
                                                             {/* Delete */}
@@ -711,8 +720,8 @@ const BlogList = () => {
                                                                 }
                                                                 title="Delete Blog"
                                                                 className="
-                                                                    w-10
-                                                                    h-10
+                                                                    w-8
+                                                                    h-8
                                                                     rounded-lg
                                                                     bg-red-600
                                                                     text-white
@@ -723,7 +732,7 @@ const BlogList = () => {
                                                                     transition
                                                                 "
                                                             >
-                                                                <Trash2 size={18} />
+                                                                <Trash2 size={14} />
                                                             </button>
 
                                                         </div>
