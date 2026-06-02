@@ -703,7 +703,7 @@ const BlogList = () => {
                                                                     text-white
                                                                     flex
                                                                     items-center
-                                                                    justify-center
+                                                                    justify-center  
                                                                     hover:bg-gray-700
                                                                     transition
                                                                 "
