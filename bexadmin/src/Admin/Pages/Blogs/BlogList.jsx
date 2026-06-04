@@ -1,4 +1,5 @@
 import React, {
+    useEffect,
     useMemo,
     useState,
 } from "react";
@@ -16,171 +17,108 @@ import {
 
 import AdminLayout from "../../Components/Layout/AdminLayout";
 
+import API_URL from "../../../Config/api";
+
 const BlogList = () => {
+
+    const [blogs, setBlogs] =
+        useState([]);
+
+    const [loading, setLoading] =
+        useState(true);
+
     const [searchTerm, setSearchTerm] =
         useState("");
+
     const [filterCategory, setFilterCategory] =
         useState("All");
 
     const [sortBy, setSortBy] =
         useState("newest");
 
-    const [blogs, setBlogs] =
-        useState(
-            JSON.parse(
-                localStorage.getItem(
-                    "blogContents"
-                )
-            ) || []
-        );
+    useEffect(() => {
 
-    const normalizeCategory = (
-        value
-    ) => {
+        fetchBlogs();
 
-        if (!value) return "";
+    }, []);
 
-        return value
-            .toLowerCase()
-            .trim();
-    };
+    const fetchBlogs =
+        async () => {
+
+            try {
+
+                const response =
+                    await fetch(
+                        `${API_URL}/admin/blog/list`
+                    );
+
+                const result =
+                    await response.json();
+
+                if (
+                    result.status
+                ) {
+
+                    setBlogs(
+                        result.data
+                    );
+                }
+
+            } catch (error) {
+
+                console.log(
+                    error
+                );
+
+            } finally {
+
+                setLoading(
+                    false
+                );
+            }
+        };
 
     const categories = [
         "All",
-        ...new Set(
-            blogs.flatMap(
-                (blog) =>
-                    Array.isArray(
-                        blog.category
-                    )
-                        ? blog.category
-                        : [
-                            blog.category,
-                        ]
-            )
-        ),
     ];
 
     const filteredBlogs =
         useMemo(() => {
 
-            let data = [...blogs];
+            let data =
+                [...blogs];
 
-            /* Category Filter */
-            if (
-                filterCategory !==
-                "All"
-            ) {
-
-                data = data.filter(
-                    (blog) => {
-
-                        if (
-                            Array.isArray(
-                                blog.category
-                            )
-                        ) {
-
-                            return blog.category.some(
-                                (cat) =>
-                                    normalizeCategory(
-                                        cat
-                                    ) ===
-                                    normalizeCategory(
-                                        filterCategory
-                                    )
-                            );
-                        }
-
-                        return (
-                            normalizeCategory(
-                                blog.category
-                            ) ===
-                            normalizeCategory(
-                                filterCategory
-                            )
-                        );
-                    }
-                );
-            }
-
-            /* Search Filter */
             if (
                 searchTerm.trim()
             ) {
 
                 const search =
-                    searchTerm
-                        .toLowerCase()
-                        .trim();
+                    searchTerm.toLowerCase();
 
-                data = data.filter(
-                    (blog) => {
-
-                        const title =
+                data =
+                    data.filter(
+                        (blog) =>
                             blog.title
-                                ?.toLowerCase() || "";
-
-                        const author =
-                            blog.author
-                                ?.toLowerCase() || "";
-
-                        const date =
-                            blog.date
-                                ?.toLowerCase() || "";
-
-                        const year =
-                            blog.date
-                                ? new Date(
-                                    blog.date
+                                ?.toLowerCase()
+                                .includes(
+                                    search
                                 )
-                                    .getFullYear()
-                                    .toString()
-                                : "";
-
-                        const category =
-                            Array.isArray(
-                                blog.category
-                            )
-                                ? blog.category
-                                    .join(
-                                        " "
-                                    )
-                                    .toLowerCase()
-                                : (
-                                    blog.category ||
-                                    ""
-                                ).toLowerCase();
-
-                        return (
-                            title.includes(
-                                search
-                            ) ||
-                            author.includes(
-                                search
-                            ) ||
-                            category.includes(
-                                search
-                            ) ||
-                            date.includes(
-                                search
-                            ) ||
-                            year.includes(
-                                search
-                            )
-                        );
-                    }
-                );
+                    );
             }
 
-            /* Sorting */
-            switch (sortBy) {
+            switch (
+            sortBy
+            ) {
 
                 case "oldest":
 
                     data.sort(
-                        (a, b) =>
-                            a.id - b.id
+                        (
+                            a,
+                            b
+                        ) =>
+                            a.id -
+                            b.id
                     );
 
                     break;
@@ -188,7 +126,10 @@ const BlogList = () => {
                 case "titleAsc":
 
                     data.sort(
-                        (a, b) =>
+                        (
+                            a,
+                            b
+                        ) =>
                             a.title.localeCompare(
                                 b.title
                             )
@@ -199,7 +140,10 @@ const BlogList = () => {
                 case "titleDesc":
 
                     data.sort(
-                        (a, b) =>
+                        (
+                            a,
+                            b
+                        ) =>
                             b.title.localeCompare(
                                 a.title
                             )
@@ -207,42 +151,15 @@ const BlogList = () => {
 
                     break;
 
-                case "category":
-
-                    data.sort(
-                        (a, b) => {
-
-                            const catA =
-                                Array.isArray(
-                                    a.category
-                                )
-                                    ? a.category.join(
-                                        ", "
-                                    )
-                                    : a.category;
-
-                            const catB =
-                                Array.isArray(
-                                    b.category
-                                )
-                                    ? b.category.join(
-                                        ", "
-                                    )
-                                    : b.category;
-
-                            return catA.localeCompare(
-                                catB
-                            );
-                        }
-                    );
-
-                    break;
-
                 default:
 
                     data.sort(
-                        (a, b) =>
-                            b.id - a.id
+                        (
+                            a,
+                            b
+                        ) =>
+                            b.id -
+                            a.id
                     );
             }
 
@@ -250,61 +167,74 @@ const BlogList = () => {
 
         }, [
             blogs,
-            filterCategory,
-            sortBy,
             searchTerm,
+            sortBy,
         ]);
 
-    const handleDelete = (
-        id
-    ) => {
+    const handleDelete =
+        async (
+            id
+        ) => {
 
-        const confirmDelete =
-            window.confirm(
-                "Delete this blog?"
-            );
+            const confirmDelete =
+                window.confirm(
+                    "Delete this blog?"
+                );
 
-        if (
-            !confirmDelete
-        ) {
-            return;
-        }
+            if (
+                !confirmDelete
+            ) {
+                return;
+            }
 
-        const updatedBlogs =
-            blogs.filter(
-                (blog) =>
-                    blog.id !== id
-            );
+            try {
 
-        localStorage.setItem(
-            "blogContents",
-            JSON.stringify(
-                updatedBlogs
-            )
-        );
+                const response =
+                    await fetch(
+                        `${API_URL}/admin/blog/delete/${id}`,
+                        {
+                            method:
+                                "DELETE",
+                        }
+                    );
 
-        setBlogs(
-            updatedBlogs
-        );
-    };
+                const result =
+                    await response.json();
 
-    /* Clear Search Only */
-    const clearSearch = () => {
-        setSearchTerm("");
-    };
+                if (
+                    result.status
+                ) {
 
-    /* Clear All Filters */
-    const clearFilters = () => {
-        setSearchTerm("");
-        setFilterCategory("All");
-        setSortBy("newest");
-    };
+                    setBlogs(
+                        (
+                            prev
+                        ) =>
+                            prev.filter(
+                                (
+                                    blog
+                                ) =>
+                                    blog.id !==
+                                    id
+                            )
+                    );
+                }
+
+            } catch (
+            error
+            ) {
+
+                console.log(
+                    error
+                );
+            }
+        };
+
     return (
+
         <AdminLayout>
 
             <div>
 
-                {/* Header */}
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
 
                     <div>
@@ -314,7 +244,8 @@ const BlogList = () => {
                         </h2>
 
                         <p className="text-gray-500 mt-1">
-                            Total Blogs:{" "}
+                            Total Blogs:
+                            {" "}
                             {
                                 filteredBlogs.length
                             }
@@ -339,95 +270,39 @@ const BlogList = () => {
 
                 </div>
 
-                {/* Filters */}
                 <div
                     className="
-                    bg-white
-                    rounded-3xl
-                    border
-                    border-black/10
-                    p-5
-                    mb-6
+                        bg-white
+                        rounded-3xl
+                        border
+                        border-black/10
+                        p-5
+                        mb-6
                     "
                 >
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                        {/* Search */}
-                        <div className="lg:col-span-2">
+
+                        <div className="lg:col-span-3">
 
                             <label className="block text-md font-medium mb-2">
                                 Search
                             </label>
 
-                            <div className="relative">
-
-                                <input
-                                    type="text"
-                                    value={searchTerm}
-                                    onChange={(e) =>
+                            <input
+                                type="text"
+                                value={
+                                    searchTerm
+                                }
+                                onChange={
+                                    (
+                                        e
+                                    ) =>
                                         setSearchTerm(
                                             e.target.value
                                         )
-                                    }
-                                    placeholder="
-                                        Search by title,
-                                        category,
-                                        author,
-                                        date,
-                                        year...
-                                    "
-                                    className="
-                                        w-full
-                                        border
-                                        rounded-xl
-                                        px-4
-                                        py-3
-                                        pr-12
-                                        text-sm
-                                        focus:outline-none
-                                        focus:ring-2
-                                        focus:ring-red-500/20
-                                    "
-                                />
-
-                                {searchTerm && (
-                                    <button
-                                        type="button"
-                                        onClick={clearSearch}
-                                        className="
-                                            absolute
-                                            right-3
-                                            top-1/2
-                                            -translate-y-1/2
-                                            text-red-500
-                                            hover:text-red-700
-                                            transition
-                                            text-sm
-                                            font-medium
-                                        "
-                                    >
-                                        ✕
-                                    </button>
-                                )}
-
-                            </div>
-
-                        </div>
-
-                        {/* Category */}
-                        <div>
-
-                            <label className="block text-md font-medium mb-2">
-                                Category Filter
-                            </label>
-
-                            <select
-                                value={filterCategory}
-                                onChange={(e) =>
-                                    setFilterCategory(
-                                        e.target.value
-                                    )
                                 }
+                                placeholder="Search Blog"
                                 className="
                                     w-full
                                     border
@@ -435,24 +310,10 @@ const BlogList = () => {
                                     px-4
                                     py-3
                                 "
-                            >
-
-                                {categories.map(
-                                    (item) => (
-                                        <option
-                                            key={item}
-                                            value={item}
-                                        >
-                                            {item}
-                                        </option>
-                                    )
-                                )}
-
-                            </select>
+                            />
 
                         </div>
 
-                        {/* Sort */}
                         <div>
 
                             <label className="block text-md font-medium mb-2">
@@ -460,11 +321,16 @@ const BlogList = () => {
                             </label>
 
                             <select
-                                value={sortBy}
-                                onChange={(e) =>
-                                    setSortBy(
-                                        e.target.value
-                                    )
+                                value={
+                                    sortBy
+                                }
+                                onChange={
+                                    (
+                                        e
+                                    ) =>
+                                        setSortBy(
+                                            e.target.value
+                                        )
                                 }
                                 className="
                                     w-full
@@ -491,41 +357,14 @@ const BlogList = () => {
                                     Title Z-A
                                 </option>
 
-                                <option value="category">
-                                    Category A-Z
-                                </option>
-
                             </select>
 
                         </div>
 
-                        {/* Clear All */}
-                        <div className="flex items-end">
-                            <button
-                                type="button"
-                                onClick={clearFilters}
-                                className="
-                                    w-full
-                                    h-[50px]
-                                    px-5
-                                    bg-gray-100
-                                    border
-                                    border-black/10
-                                    rounded-xl
-                                    text-sm
-                                    font-medium
-                                    hover:bg-red-600
-                                    hover:text-white
-                                    transition
-                                "
-                            >
-                                Reset Filters
-                            </button>
-                        </div>
                     </div>
+
                 </div>
 
-                {/* Table */}
                 <div
                     className="
                         bg-white
@@ -536,7 +375,7 @@ const BlogList = () => {
                     "
                 >
 
-                    <div className="overflow-x-auto scrollbar-thin">
+                    <div className="overflow-x-auto">
 
                         <table className="w-full">
 
@@ -544,23 +383,23 @@ const BlogList = () => {
 
                                 <tr>
 
-                                    <th className="px-3 py-3 text-left text-md font-medium whitespace-nowrap">
-                                        Image
-                                    </th>
-
-                                    <th className="px-3 py-3 text-left text-md font-medium whitespace-nowrap">
+                                    <th className="px-3 py-3 text-left">
                                         Title
                                     </th>
 
-                                    <th className="px-3 py-3 text-left text-md font-medium whitespace-nowrap">
-                                        Category
+                                    <th className="px-3 py-3 text-left">
+                                        Slug
                                     </th>
 
-                                    <th className="px-3 py-3 text-left text-md font-medium whitespace-nowrap">
-                                        Date
+                                    <th className="px-3 py-3 text-left">
+                                        Status
                                     </th>
 
-                                    <th className="px-3 py-3 text-left text-md font-medium whitespace-nowrap">
+                                    <th className="px-3 py-3 text-left">
+                                        Display Date
+                                    </th>
+
+                                    <th className="px-3 py-3 text-left">
                                         Actions
                                     </th>
 
@@ -570,178 +409,138 @@ const BlogList = () => {
 
                             <tbody>
 
-                                {filteredBlogs.length >
-                                    0 ? (
+                                {loading ? (
+
+                                    <tr>
+
+                                        <td
+                                            colSpan="5"
+                                            className="text-center py-10"
+                                        >
+                                            Loading...
+                                        </td>
+
+                                    </tr>
+
+                                ) : filteredBlogs.length > 0 ? (
 
                                     filteredBlogs.map(
                                         (
                                             blog
-                                        ) => {
+                                        ) => (
 
-                                            const category =
-                                                Array.isArray(
-                                                    blog.category
-                                                )
-                                                    ? blog.category.join(
-                                                        ", "
-                                                    )
-                                                    : blog.category;
+                                            <tr
+                                                key={
+                                                    blog.id
+                                                }
+                                                className="border-t"
+                                            >
 
-                                            return (
-
-                                                <tr
-                                                    key={
-                                                        blog.id
+                                                <td className="px-3 py-2">
+                                                    {
+                                                        blog.title
                                                     }
-                                                    className="border-t"
-                                                >
+                                                </td>
 
-                                                    <td className="px-3 py-2 text-[14px]">
+                                                <td className="px-3 py-2">
+                                                    {
+                                                        blog.slug
+                                                    }
+                                                </td>
 
-                                                        <img
-                                                            src={
-                                                                blog.image
-                                                            }
-                                                            alt=""
+                                                <td className="px-3 py-2">
+                                                    {
+                                                        blog.blog_status
+                                                    }
+                                                </td>
+
+                                                <td className="px-3 py-2">
+                                                    {
+                                                        new Date(
+                                                            blog.display_date
+                                                        ).toLocaleDateString()
+                                                    }
+                                                </td>
+
+                                                <td className="px-3 py-2">
+
+                                                    <div className="flex gap-1">
+
+                                                        <Link
+                                                            to={`/admin/blogs/view/${blog.id}`}
                                                             className="
-                                                                w-20
-                                                                h-14
-                                                                rounded-md
-                                                                object-cover
-                                                            "
-                                                        />
-
-                                                    </td>
-
-                                                    <td className="px-3 py-2 font-medium text-[14px] max-w-[220px]">
-                                                        {
-                                                            blog.title
-                                                        }
-                                                    </td>
-
-                                                    <td className="px-3 py-2 text-[14px]">
-
-                                                        <span
-                                                            className="
-                                                                px-2
-                                                                py-1
-                                                                bg-gray-100
-                                                                rounded-full
-                                                                text-[14px]
-                                                                whitespace-nowrap
+                                                                w-8
+                                                                h-8
+                                                                bg-blue-50
+                                                                text-blue-600
+                                                                rounded-lg
+                                                                flex
+                                                                items-center
+                                                                justify-center
                                                             "
                                                         >
-                                                            {
-                                                                category
+                                                            <Eye size={14} />
+                                                        </Link>
+
+                                                        <Link
+                                                            to={`/blog/${blog.slug}`}
+                                                            target="_blank"
+                                                            className="
+                                                                w-8
+                                                                h-8
+                                                                bg-green-50
+                                                                text-green-600
+                                                                rounded-lg
+                                                                flex
+                                                                items-center
+                                                                justify-center
+                                                            "
+                                                        >
+                                                            <ExternalLink size={14} />
+                                                        </Link>
+
+                                                        <Link
+                                                            to={`/admin/blogs/edit/${blog.id}`}
+                                                            className="
+                                                                w-8
+                                                                h-8
+                                                                bg-black
+                                                                text-white
+                                                                rounded-lg
+                                                                flex
+                                                                items-center
+                                                                justify-center
+                                                            "
+                                                        >
+                                                            <Pencil size={14} />
+                                                        </Link>
+
+                                                        <button
+                                                            onClick={() =>
+                                                                handleDelete(
+                                                                    blog.id
+                                                                )
                                                             }
-                                                        </span>
+                                                            className="
+                                                                w-8
+                                                                h-8
+                                                                bg-red-600
+                                                                text-white
+                                                                rounded-lg
+                                                                flex
+                                                                items-center
+                                                                justify-center
+                                                            "
+                                                        >
+                                                            <Trash2 size={14} />
+                                                        </button>
 
-                                                    </td>
+                                                    </div>
 
-                                                    <td className="px-3 py-2 text-[14px] whitespace-nowrap">
-                                                        {
-                                                            blog.date
-                                                        }
-                                                    </td>
+                                                </td>
 
-                                                    <td className="px-3 py-2 text-[14px]">
-
-                                                        <div className="flex items-center gap-1">
-
-                                                            {/* Admin View */}
-                                                            <Link
-                                                                to={`/admin/blogs/view/${blog.id}`}
-                                                                title="View Blog"
-                                                                className="
-                                                                    w-8
-                                                                    h-8
-                                                                    rounded-lg
-                                                                    bg-blue-50
-                                                                    text-blue-600
-                                                                    flex
-                                                                    items-center
-                                                                    justify-center
-                                                                    hover:bg-blue-600
-                                                                    hover:text-white
-                                                                    transition
-                                                                "
-                                                            >
-                                                                <Eye size={14} />
-                                                            </Link>
-
-                                                            {/* Front View */}
-                                                            <Link
-                                                                to={`/blog/${blog.slug || blog.id}`}
-                                                                target="_blank"
-                                                                title="Front View"
-                                                                className="
-                                                                    w-8
-                                                                    h-8
-                                                                    rounded-lg
-                                                                    bg-green-50
-                                                                    text-green-600
-                                                                    flex
-                                                                    items-center
-                                                                    justify-center
-                                                                    hover:bg-green-600
-                                                                    hover:text-white
-                                                                    transition
-                                                                "
-                                                            >
-                                                                <ExternalLink size={14} />
-                                                            </Link>
-
-                                                            {/* Edit */}
-                                                            <Link
-                                                                to={`/admin/blogs/edit/${blog.id}`}
-                                                                title="Edit Blog"
-                                                                className="
-                                                                    w-8
-                                                                    h-8
-                                                                    rounded-lg
-                                                                    bg-black
-                                                                    text-white
-                                                                    flex
-                                                                    items-center
-                                                                    justify-center  
-                                                                    hover:bg-gray-700
-                                                                    transition
-                                                                "
-                                                            >
-                                                                <Pencil size={14} />
-                                                            </Link>
-
-                                                            {/* Delete */}
-                                                            <button
-                                                                onClick={() =>
-                                                                    handleDelete(
-                                                                        blog.id
-                                                                    )
-                                                                }
-                                                                title="Delete Blog"
-                                                                className="
-                                                                    w-8
-                                                                    h-8
-                                                                    rounded-lg
-                                                                    bg-red-600
-                                                                    text-white
-                                                                    flex
-                                                                    items-center
-                                                                    justify-center
-                                                                    hover:bg-red-700
-                                                                    transition
-                                                                "
-                                                            >
-                                                                <Trash2 size={14} />
-                                                            </button>
-
-                                                        </div>
-
-                                                    </td>
-
-                                                </tr>
-                                            );
-                                        }
+                                            </tr>
+                                        )
                                     )
 
                                 ) : (
@@ -750,11 +549,7 @@ const BlogList = () => {
 
                                         <td
                                             colSpan="5"
-                                            className="
-                                                py-12
-                                                text-center
-                                                text-gray-500
-                                            "
+                                            className="text-center py-10"
                                         >
                                             No Blogs Found
                                         </td>
