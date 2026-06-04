@@ -1,4 +1,4 @@
 const API_URL =
-    "http://localhost:5000";
+    "http://api.bexcod.com/";
 
 export default API_URL;
