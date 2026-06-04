@@ -253,7 +253,7 @@ const UserAdd = () => {
                                 }
                             >
                                 <option>
-                                    Administrator
+                                    Admin
                                 </option>
 
                                 <option>

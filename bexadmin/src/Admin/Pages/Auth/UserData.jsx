@@ -6,7 +6,7 @@ const UserData = [
         lastName: "Admin",
         email: "vimal@bexcodeservices.com",
         password: "123456",
-        role: "Administrator",
+        role: "admin",
         profile:
             "https://i.pravatar.cc/300?img=12",
     },

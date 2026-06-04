@@ -4,7 +4,7 @@ const users = [
     {
         id: 1,
         username: "aakash@bexcodeservices.com",
-        role: "administrator",
+        role: "admin",
         user_status: "active",
         fname: "Aakash",
         lname: "Kumar",

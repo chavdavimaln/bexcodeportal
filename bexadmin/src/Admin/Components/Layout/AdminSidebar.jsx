@@ -39,7 +39,7 @@ const AdminSidebar = ({
         loggedUser?.role
             ?.toLowerCase()
             ?.trim() ===
-        "administrator";
+        "admin";
 
     return (
         <>

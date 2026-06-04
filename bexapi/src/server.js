@@ -31,3 +31,13 @@ app.listen(
 
     }
 );
+
+const blogRoutes =
+    require(
+        "./routes/blogRoutes"
+    );
+
+app.use(
+    "/admin/blog",
+    blogRoutes
+);

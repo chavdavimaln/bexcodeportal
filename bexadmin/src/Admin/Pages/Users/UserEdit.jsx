@@ -232,7 +232,7 @@ const UserEdit = () => {
                                 className="w-full border rounded-xl px-4 py-3"
                             >
                                 <option>
-                                    Administrator
+                                    Admin
                                 </option>
 
                                 <option>
