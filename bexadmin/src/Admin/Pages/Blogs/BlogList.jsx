@@ -8,8 +8,6 @@ import {
     Link,
 } from "react-router-dom";
 
-import { API_URL } from "../../../Config/api.jsx";
-
 import {
     Pencil,
     Trash2,
@@ -18,7 +16,7 @@ import {
 } from "lucide-react";
 
 import AdminLayout from "../../Components/Layout/AdminLayout";
-
+import { API_URL } from "../../../Config/api";
 
 
 const BlogList = () => {
@@ -27,6 +25,7 @@ const BlogList = () => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
     const [sortBy, setSortBy] = useState("newest");
+
     useEffect(() => {
         fetchBlogs();
     }, []);
@@ -42,7 +41,8 @@ const BlogList = () => {
                     {
                         method: "GET",
                         headers: {
-                            "Content-Type": "application/json",
+                            contentType:
+                                "application/json",
                             Authorization: `Bearer ${token}`,
                         },
                     }
@@ -55,78 +55,69 @@ const BlogList = () => {
                 result.status
             ) {
 
-            const token = localStorage.getItem("token");
-            const response = await fetch(`${API_URL}/admin/blog/list`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-            const result = await response.json();
-            if (result.status) {
-                setBlogs(result.data);
+                setBlogs(
+                    result.data
+                );
             }
+
         } catch (error) {
-            console.error("Blog Fetch Error:", error);
+            console.error(
+                "Blog Fetch Error:",
+                error
+            );
         } finally {
-            setLoading(false);
+            setLoading(
+                false
+            );
         }
     };
 
-    const handleDelete = async (id) => {
+    const handleDelete =
+        async (id) => {
 
-        const confirmDelete =
-            window.confirm(
-                "Are you sure you want to delete this blog?"
-            );
-
-        if (!confirmDelete) {
-            return;
-        }
-
-        try {
-
-            const token =
-                localStorage.getItem("token");
-
-            const response =
-                await fetch(
-                    `${API_URL}/admin/blog/delete/${id}`,
-                    {
-                        method: "DELETE",
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
-                );
-
-            const result =
-                await response.json();
-
-            if (result.status) {
-
-                alert(result.message);
-
-                setBlogs((prev) =>
-                    prev.filter(
-                        (blog) => blog.id !== id
-                    )
-                );
-
-            } else {
-
-                alert(result.message);
+            if (
+                !window.confirm(
+                    "Delete this blog?"
+                )
+            ) {
+                return;
             }
 
-        } catch (error) {
+            try {
 
-            console.error(error);
+                const token =
+                    localStorage.getItem("token");
 
-            alert(
-                "Unable to delete blog."
-            );
-        }
-    };
+                const response =
+                    await fetch(
+                        `${API_URL}/admin/blog/delete/${id}`,
+                        {
+                            method:
+                                "DELETE",
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                            },
+                        }
+                    );
+
+                const result =
+                    await response.json();
+
+                if (
+                    result.status
+                ) {
+                    alert(
+                        "Blog deleted successfully."
+                    );
+                    fetchBlogs();
+                }
+
+            } catch (error) {
+                console.error(
+                    error
+                );
+            }
+        };
 
     const filteredBlogs =
         useMemo(() => {
