@@ -13,7 +13,7 @@ import {
 } from "react-router-dom";
 
 import AdminLayout from "../../Components/Layout/AdminLayout";
-import API_URL from "../../../Config/api";
+import {API_URL} from "../../../Config/api";
 import JoditEditor from "jodit-react";
 
 const BlogEdit = () => {
