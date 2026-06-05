@@ -11,22 +11,40 @@ const Blog = require("../models/Blog");
 */
 router.get("/list", async (req, res) => {
     try {
-        const blogs = await Blog.find().sort({
-            createdAt: -1,
-        });
+
+        const blogs =
+            await Blog.find()
+                .sort({
+                    createdAt: -1,
+                });
+
+        const blogData =
+            blogs.map((blog) => ({
+
+                ...blog.toObject(),
+
+                image_full_url:
+                    blog.image_url
+                        ? `${req.protocol}://${req.get("host")}${blog.image_url}`
+                        : "",
+
+            }));
 
         return res.json({
             status: true,
             message: "Blogs fetched successfully.",
-            data: blogs,
-            total: blogs.length,
+            data: blogData,
+            total: blogData.length,
             page_no: 1,
         });
+
     } catch (error) {
+
         return res.status(500).json({
             status: false,
             message: error.message,
         });
+
     }
 });
 
@@ -96,30 +114,58 @@ router.post("/create", async (req, res) => {
 | UPDATE BLOG
 |--------------------------------------------------------------------------
 */
-router.put("/update/:id", async (req, res) => {
-    try {
+// router.put("/update/:id", async (req, res) => {
+//     try {
+//         const updatedBlog =
+//             await Blog.findByIdAndUpdate(
+//                 req.params.id,
+//                 req.body,
+//                 {
+//                     new: true,
+//                 }
+//             );
+
+//         return res.json({
+//             status: true,
+//             message:
+//                 "Blog updated successfully.",
+//             data: updatedBlog,
+//         });
+//     } catch (error) {
+//         return res.status(500).json({
+//             status: false,
+//             message: error.message,
+//         });
+//     }
+// });
+router.put(
+    "/update/:id",
+    upload.single("image_url"),
+    async (req, res) => {
+
+        const updateData = {
+            ...req.body,
+        };
+
+        if (req.file) {
+            updateData.image_url =
+                `/uploads/blogs/${req.file.filename}`;
+        }
+
         const updatedBlog =
             await Blog.findByIdAndUpdate(
                 req.params.id,
-                req.body,
-                {
-                    new: true,
-                }
+                updateData,
+                { new: true }
             );
 
-        return res.json({
+        res.json({
             status: true,
-            message:
-                "Blog updated successfully.",
+            message: "Blog updated successfully.",
             data: updatedBlog,
         });
-    } catch (error) {
-        return res.status(500).json({
-            status: false,
-            message: error.message,
-        });
     }
-});
+);
 
 /*
 |--------------------------------------------------------------------------

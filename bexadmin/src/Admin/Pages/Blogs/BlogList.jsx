@@ -19,6 +19,8 @@ import {
 
 import AdminLayout from "../../Components/Layout/AdminLayout";
 
+
+
 const BlogList = () => {
 
     const [blogs, setBlogs] = useState([]);
@@ -30,21 +32,21 @@ const BlogList = () => {
     }, []);
 
     const fetchBlogs = async () => {
-
         try {
+
             const token = localStorage.getItem("token");
             const response = await fetch(`${API_URL}/admin/blog/list`,
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
             const result = await response.json();
             if (result.status) {
                 setBlogs(result.data);
             }
         } catch (error) {
-            console.error(error);
+            console.error("Blog Fetch Error:", error);
         } finally {
             setLoading(false);
         }
@@ -62,12 +64,18 @@ const BlogList = () => {
 
             try {
 
+                const token =
+                    localStorage.getItem("token");
+
                 const response =
                     await fetch(
                         `${API_URL}/admin/blog/delete/${id}`,
                         {
                             method:
                                 "DELETE",
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                            },
                         }
                     );
 
@@ -77,12 +85,13 @@ const BlogList = () => {
                 if (
                     result.status
                 ) {
-
+                    alert(
+                        "Blog deleted successfully."
+                    );
                     fetchBlogs();
                 }
 
             } catch (error) {
-
                 console.error(
                     error
                 );
@@ -101,9 +110,7 @@ const BlogList = () => {
 
                 data =
                     data.filter(
-                        (
-                            blog
-                        ) =>
+                        (blog) =>
                             blog.title
                                 ?.toLowerCase()
                                 .includes(
@@ -195,9 +202,7 @@ const BlogList = () => {
                         <input
                             type="text"
                             placeholder="Search Blog"
-                            value={
-                                searchTerm
-                            }
+                            value={searchTerm}
                             onChange={(
                                 e
                             ) =>
@@ -215,12 +220,8 @@ const BlogList = () => {
                         />
 
                         <select
-                            value={
-                                sortBy
-                            }
-                            onChange={(
-                                e
-                            ) =>
+                            value={sortBy}
+                            onChange={(e) =>
                                 setSortBy(
                                     e.target
                                         .value
@@ -298,33 +299,23 @@ const BlogList = () => {
                                 0 ? (
 
                                 filteredBlogs.map(
-                                    (
-                                        blog
-                                    ) => (
+                                    (blog) => (
 
                                         <tr
-                                            key={
-                                                blog.id
-                                            }
+                                            key={blog.id}
                                             className="border-t"
                                         >
 
                                             <td className="p-3">
-                                                {
-                                                    blog.id
-                                                }
+                                                {blog.id}
                                             </td>
 
                                             <td className="p-3">
-                                                {
-                                                    blog.title
-                                                }
+                                                {blog.title}
                                             </td>
 
                                             <td className="p-3">
-                                                {
-                                                    blog.slug
-                                                }
+                                                {blog.slug}
                                             </td>
 
                                             <td className="p-3">
@@ -371,39 +362,28 @@ const BlogList = () => {
                                                     >
                                                         <Trash2 size={14} />
                                                     </button>
-
                                                 </div>
-
                                             </td>
-
                                         </tr>
-
                                     )
                                 )
 
                             ) : (
 
                                 <tr>
-
                                     <td
                                         colSpan="5"
                                         className="text-center p-5"
                                     >
                                         No Blogs Found
                                     </td>
-
                                 </tr>
-
                             )}
 
                         </tbody>
-
                     </table>
-
                 </div>
-
             </div>
-
         </AdminLayout>
     );
 };
