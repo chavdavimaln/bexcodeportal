@@ -34,7 +34,7 @@ const BlogList = () => {
         try {
             const token =
                 localStorage.getItem("token");
-                
+
             const response =
                 await fetch(
                     `${API_URL}/admin/blog/list`,
@@ -50,7 +50,7 @@ const BlogList = () => {
 
             const result =
                 await response.json();
-                console.log("Blog List API Response:", result);
+            console.log("Blog List API Response:", result);
             if (
                 result.status
             ) {
@@ -85,7 +85,7 @@ const BlogList = () => {
 
             try {
 
-                const  token =
+                const token =
                     localStorage.getItem("token");
 
                 const response =
@@ -131,7 +131,7 @@ const BlogList = () => {
 
                 data =
                     data.filter(
-                        ( blog) =>
+                        (blog) =>
                             blog.title
                                 ?.toLowerCase()
                                 .includes(
@@ -223,7 +223,7 @@ const BlogList = () => {
                         <input
                             type="text"
                             placeholder="Search Blog"
-                            value={ searchTerm }
+                            value={searchTerm}
                             onChange={(
                                 e
                             ) =>
@@ -241,7 +241,7 @@ const BlogList = () => {
                         />
 
                         <select
-                            value={ sortBy }
+                            value={sortBy}
                             onChange={(e) =>
                                 setSortBy(
                                     e.target
@@ -273,7 +273,7 @@ const BlogList = () => {
 
                     <table className="w-full">
 
-                        <thead className="bg-gray-100">
+                        {/* <thead className="bg-gray-100">
 
                             <tr>
 
@@ -299,6 +299,35 @@ const BlogList = () => {
 
                             </tr>
 
+                        </thead> */}
+                        <thead className="bg-gray-50">
+                            <tr>
+
+                                <th className="px-3 py-3 text-left">
+                                    Image
+                                </th>
+
+                                <th className="px-3 py-3 text-left">
+                                    Title
+                                </th>
+
+                                <th className="px-3 py-3 text-left">
+                                    Slug
+                                </th>
+
+                                <th className="px-3 py-3 text-left">
+                                    Status
+                                </th>
+
+                                <th className="px-3 py-3 text-left">
+                                    Display Date
+                                </th>
+
+                                <th className="px-3 py-3 text-left">
+                                    Actions
+                                </th>
+
+                            </tr>
                         </thead>
 
                         <tbody>
@@ -322,55 +351,182 @@ const BlogList = () => {
                                 filteredBlogs.map(
                                     (blog) => (
 
+                                        // <tr
+                                        //     key={blog.id}
+                                        //     className="border-t"
+                                        // >
+
+                                        //     <td className="p-3">
+                                        //         {blog.id}
+                                        //     </td>
+
+                                        //     <td className="p-3">
+                                        //         {blog.title}
+                                        //     </td>
+
+                                        //     <td className="p-3">
+                                        //         {blog.slug}
+                                        //     </td>
+
+                                        //     <td className="p-3">
+                                        //         {
+                                        //             new Date(
+                                        //                 blog.display_date
+                                        //             ).toLocaleDateString()
+                                        //         }
+                                        //     </td>
+
+                                        //     <td className="p-3">
+
+                                        //         <div className="flex gap-2">
+
+                                        //             <Link
+                                        //                 to={`/admin/blogs/view/${blog.id}`}
+                                        //                 className="p-2 bg-blue-100 rounded"
+                                        //             >
+                                        //                 <Eye size={14} />
+                                        //             </Link>
+
+                                        //             <Link
+                                        //                 to={`/admin/blogs/edit/${blog.id}`}
+                                        //                 className="p-2 bg-black text-white rounded"
+                                        //             >
+                                        //                 <Pencil size={14} />
+                                        //             </Link>
+
+                                        //             <Link
+                                        //                 to={`/blog/${blog.slug}`}
+                                        //                 target="_blank"
+                                        //                 className="p-2 bg-green-100 rounded"
+                                        //             >
+                                        //                 <ExternalLink size={14} />
+                                        //             </Link>
+
+                                        //             <button
+                                        //                 onClick={() =>
+                                        //                     handleDelete(
+                                        //                         blog.id
+                                        //                     )
+                                        //                 }
+                                        //                 className="p-2 bg-red-600 text-white rounded"
+                                        //             >
+                                        //                 <Trash2 size={14} />
+                                        //             </button>
+                                        //         </div>
+                                        //     </td>
+                                        // </tr>
                                         <tr
                                             key={blog.id}
                                             className="border-t"
                                         >
 
-                                            <td className="p-3">
-                                                {blog.id}
+                                            <td className="px-3 py-2">
+
+                                                {/* <img
+                                                    src={blog.image_full_url}
+                                                    alt={blog.title}
+                                                    className="
+                                                        w-16
+                                                        h-16
+                                                        object-cover
+                                                        rounded-lg
+                                                        border
+                                                    "
+                                                /> */}
+                                                <img
+                                                    src={`http://api.bexcod.com${blog.image_url}`}
+                                                    alt={blog.title}
+                                                    className="w-16 h-16 object-cover rounded-lg"
+                                                />
+
                                             </td>
 
-                                            <td className="p-3">
+                                            <td className="px-3 py-2">
                                                 {blog.title}
                                             </td>
 
-                                            <td className="p-3">
+                                            <td className="px-3 py-2">
                                                 {blog.slug}
                                             </td>
 
-                                            <td className="p-3">
-                                                {
-                                                    new Date(
-                                                        blog.display_date
-                                                    ).toLocaleDateString()
-                                                }
+                                            <td className="px-3 py-2">
+
+                                                <span
+                                                    className={`
+                                                            px-2
+                                                            py-1
+                                                            rounded-full
+                                                            text-xs
+                                                            font-medium
+
+                                                            ${blog.blog_status === "publish"
+                                                            ? "bg-green-100 text-green-700"
+                                                            : "bg-yellow-100 text-yellow-700"
+                                                        }
+                                                    `}
+                                                >
+                                                    {blog.blog_status || "draft"}
+                                                </span>
+
                                             </td>
 
-                                            <td className="p-3">
+                                            <td className="px-3 py-2">
+                                                {new Date(
+                                                    blog.display_date
+                                                ).toLocaleDateString()}
+                                            </td>
 
-                                                <div className="flex gap-2">
+                                            <td className="px-3 py-2">
+
+                                                <div className="flex gap-1">
 
                                                     <Link
                                                         to={`/admin/blogs/view/${blog.id}`}
-                                                        className="p-2 bg-blue-100 rounded"
+                                                        className="
+                                                            w-8
+                                                            h-8
+                                                            bg-blue-50
+                                                            text-blue-600
+                                                            rounded-lg
+                                                            flex
+                                                            items-center
+                                                            justify-center
+                                                        "
                                                     >
                                                         <Eye size={14} />
                                                     </Link>
 
                                                     <Link
-                                                        to={`/admin/blogs/edit/${blog.id}`}
-                                                        className="p-2 bg-black text-white rounded"
+                                                        to={`/blog/${blog.slug}`}
+                                                        target="_blank"
+                                                        className="
+                                                            w-8
+                                                            h-8
+                                                            bg-green-50
+                                                            text-green-600
+                                                            rounded-lg
+                                                            flex
+                                                            items-center
+                                                            justify-center
+                                                        "
                                                     >
-                                                        <Pencil size={14} />
+                                                        <ExternalLink size={14} />
                                                     </Link>
 
                                                     <Link
-                                                        to={`/blog/${blog.slug}`}
-                                                        target="_blank"
-                                                        className="p-2 bg-green-100 rounded"
+                                                        to={`/admin/blogs/edit/${blog.id}`}
+                                                        className="
+                                                            w-8
+                                                            h-8
+                                                            bg-black
+                                                            text-white
+                                                            rounded-lg
+                                                            flex
+                                                            items-center
+                                                            justify-center
+                                                        "
                                                     >
-                                                        <ExternalLink size={14} />
+                                                        <Pencil size={14} />
                                                     </Link>
 
                                                     <button
@@ -379,12 +535,24 @@ const BlogList = () => {
                                                                 blog.id
                                                             )
                                                         }
-                                                        className="p-2 bg-red-600 text-white rounded"
+                                                        className="
+                                                            w-8
+                                                            h-8
+                                                            bg-red-600
+                                                            text-white
+                                                            rounded-lg
+                                                            flex
+                                                            items-center
+                                                            justify-center
+                                                        "
                                                     >
                                                         <Trash2 size={14} />
                                                     </button>
+
                                                 </div>
+
                                             </td>
+
                                         </tr>
                                     )
                                 )
