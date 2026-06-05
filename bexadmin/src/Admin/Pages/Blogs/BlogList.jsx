@@ -41,8 +41,7 @@ const BlogList = () => {
                     {
                         method: "GET",
                         headers: {
-                            contentType:
-                                "application/json",
+                            "Content-Type": "application/json",
                             Authorization: `Bearer ${token}`,
                         },
                     }
@@ -72,52 +71,60 @@ const BlogList = () => {
         }
     };
 
-    const handleDelete =
-        async (id) => {
+    const handleDelete = async (id) => {
 
-            if (
-                !window.confirm(
-                    "Delete this blog?"
-                )
-            ) {
-                return;
-            }
+        const confirmDelete =
+            window.confirm(
+                "Are you sure you want to delete this blog?"
+            );
 
-            try {
+        if (!confirmDelete) {
+            return;
+        }
 
-                const token =
-                    localStorage.getItem("token");
+        try {
 
-                const response =
-                    await fetch(
-                        `${API_URL}/admin/blog/delete/${id}`,
-                        {
-                            method:
-                                "DELETE",
-                            headers: {
-                                Authorization: `Bearer ${token}`,
-                            },
-                        }
-                    );
+            const token =
+                localStorage.getItem("token");
 
-                const result =
-                    await response.json();
-
-                if (
-                    result.status
-                ) {
-                    alert(
-                        "Blog deleted successfully."
-                    );
-                    fetchBlogs();
-                }
-
-            } catch (error) {
-                console.error(
-                    error
+            const response =
+                await fetch(
+                    `${API_URL}/admin/blog/delete/${id}`,
+                    {
+                        method: "DELETE",
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
                 );
+
+            const result =
+                await response.json();
+
+            if (result.status) {
+
+                alert(result.message);
+
+                setBlogs((prev) =>
+                    prev.filter(
+                        (blog) => blog.id !== id
+                    )
+                );
+
+            } else {
+
+                alert(result.message);
             }
-        };
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert(
+                "Unable to delete blog."
+            );
+        }
+    };
 
     const filteredBlogs =
         useMemo(() => {

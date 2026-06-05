@@ -172,23 +172,38 @@ router.put(
 | DELETE BLOG
 |--------------------------------------------------------------------------
 */
+/*
+|--------------------------------------------------------------------------
+| DELETE BLOG
+|--------------------------------------------------------------------------
+*/
 router.delete("/delete/:id", async (req, res) => {
+
     try {
-        await Blog.findByIdAndDelete(
-            req.params.id
-        );
+
+        const blog =
+            await Blog.findOneAndDelete({
+                id: parseInt(req.params.id),
+            });
+
+        if (!blog) {
+
+            return res.status(404).json({
+                status: false,
+                message: "Blog not found",
+            });
+        }
 
         return res.json({
             status: true,
-            message:
-                "Blog deleted successfully.",
+            message: "Blog deleted successfully.",
         });
+
     } catch (error) {
+
         return res.status(500).json({
             status: false,
             message: error.message,
         });
     }
 });
-
-module.exports = router;
