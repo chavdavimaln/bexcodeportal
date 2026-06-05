@@ -8,6 +8,8 @@ import {
     Link,
 } from "react-router-dom";
 
+import { API_URL } from "../../../Config/api.jsx";
+
 import {
     Pencil,
     Trash2,
@@ -16,7 +18,7 @@ import {
 } from "lucide-react";
 
 import AdminLayout from "../../Components/Layout/AdminLayout";
-import API_URL from "../../../Config/api";
+
 
 
 const BlogList = () => {
@@ -25,53 +27,30 @@ const BlogList = () => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
     const [sortBy, setSortBy] = useState("newest");
-
     useEffect(() => {
         fetchBlogs();
     }, []);
 
     const fetchBlogs = async () => {
         try {
-            const token =
-                localStorage.getItem("token");
 
-            const response =
-                await fetch(
-                    `${API_URL}/admin/blog/list`,
-                    {
-                        method: "GET",
-                        headers: {
-                            contentType:
-                                "application/json",
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
-                );
-
-            const result =
-                await response.json();
-            console.log("Blog List API Response:", result);
-            if (
-                result.status
-            ) {
-
-                setBlogs(
-                    result.data
-                );
+            const token = localStorage.getItem("token");
+            const response = await fetch(`${API_URL}/admin/blog/list`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+            const result = await response.json();
+            if (result.status) {
+                setBlogs(result.data);
             }
-
         } catch (error) {
-            console.error(
-                "Blog Fetch Error:",
-                error
-            );
+            console.error("Blog Fetch Error:", error);
         } finally {
-            setLoading(
-                false
-            );
+            setLoading(false);
         }
     };
-
     const handleDelete =
         async (id) => {
 
@@ -273,7 +252,7 @@ const BlogList = () => {
 
                     <table className="w-full">
 
-                        {/* <thead className="bg-gray-100">
+                        <thead className="bg-gray-100">
 
                             <tr>
 
@@ -299,35 +278,6 @@ const BlogList = () => {
 
                             </tr>
 
-                        </thead> */}
-                        <thead className="bg-gray-50">
-                            <tr>
-
-                                <th className="px-3 py-3 text-left">
-                                    Image
-                                </th>
-
-                                <th className="px-3 py-3 text-left">
-                                    Title
-                                </th>
-
-                                <th className="px-3 py-3 text-left">
-                                    Slug
-                                </th>
-
-                                <th className="px-3 py-3 text-left">
-                                    Status
-                                </th>
-
-                                <th className="px-3 py-3 text-left">
-                                    Display Date
-                                </th>
-
-                                <th className="px-3 py-3 text-left">
-                                    Actions
-                                </th>
-
-                            </tr>
                         </thead>
 
                         <tbody>
@@ -351,182 +301,55 @@ const BlogList = () => {
                                 filteredBlogs.map(
                                     (blog) => (
 
-                                        // <tr
-                                        //     key={blog.id}
-                                        //     className="border-t"
-                                        // >
-
-                                        //     <td className="p-3">
-                                        //         {blog.id}
-                                        //     </td>
-
-                                        //     <td className="p-3">
-                                        //         {blog.title}
-                                        //     </td>
-
-                                        //     <td className="p-3">
-                                        //         {blog.slug}
-                                        //     </td>
-
-                                        //     <td className="p-3">
-                                        //         {
-                                        //             new Date(
-                                        //                 blog.display_date
-                                        //             ).toLocaleDateString()
-                                        //         }
-                                        //     </td>
-
-                                        //     <td className="p-3">
-
-                                        //         <div className="flex gap-2">
-
-                                        //             <Link
-                                        //                 to={`/admin/blogs/view/${blog.id}`}
-                                        //                 className="p-2 bg-blue-100 rounded"
-                                        //             >
-                                        //                 <Eye size={14} />
-                                        //             </Link>
-
-                                        //             <Link
-                                        //                 to={`/admin/blogs/edit/${blog.id}`}
-                                        //                 className="p-2 bg-black text-white rounded"
-                                        //             >
-                                        //                 <Pencil size={14} />
-                                        //             </Link>
-
-                                        //             <Link
-                                        //                 to={`/blog/${blog.slug}`}
-                                        //                 target="_blank"
-                                        //                 className="p-2 bg-green-100 rounded"
-                                        //             >
-                                        //                 <ExternalLink size={14} />
-                                        //             </Link>
-
-                                        //             <button
-                                        //                 onClick={() =>
-                                        //                     handleDelete(
-                                        //                         blog.id
-                                        //                     )
-                                        //                 }
-                                        //                 className="p-2 bg-red-600 text-white rounded"
-                                        //             >
-                                        //                 <Trash2 size={14} />
-                                        //             </button>
-                                        //         </div>
-                                        //     </td>
-                                        // </tr>
                                         <tr
                                             key={blog.id}
                                             className="border-t"
                                         >
 
-                                            <td className="px-3 py-2">
-
-                                                {/* <img
-                                                    src={blog.image_full_url}
-                                                    alt={blog.title}
-                                                    className="
-                                                        w-16
-                                                        h-16
-                                                        object-cover
-                                                        rounded-lg
-                                                        border
-                                                    "
-                                                /> */}
-                                                <img
-                                                    src={`http://api.bexcod.com${blog.image_url}`}
-                                                    alt={blog.title}
-                                                    className="w-16 h-16 object-cover rounded-lg"
-                                                />
-
+                                            <td className="p-3">
+                                                {blog.id}
                                             </td>
 
-                                            <td className="px-3 py-2">
+                                            <td className="p-3">
                                                 {blog.title}
                                             </td>
 
-                                            <td className="px-3 py-2">
+                                            <td className="p-3">
                                                 {blog.slug}
                                             </td>
 
-                                            <td className="px-3 py-2">
-
-                                                <span
-                                                    className={`
-                                                            px-2
-                                                            py-1
-                                                            rounded-full
-                                                            text-xs
-                                                            font-medium
-
-                                                            ${blog.blog_status === "publish"
-                                                            ? "bg-green-100 text-green-700"
-                                                            : "bg-yellow-100 text-yellow-700"
-                                                        }
-                                                    `}
-                                                >
-                                                    {blog.blog_status || "draft"}
-                                                </span>
-
+                                            <td className="p-3">
+                                                {
+                                                    new Date(
+                                                        blog.display_date
+                                                    ).toLocaleDateString()
+                                                }
                                             </td>
 
-                                            <td className="px-3 py-2">
-                                                {new Date(
-                                                    blog.display_date
-                                                ).toLocaleDateString()}
-                                            </td>
+                                            <td className="p-3">
 
-                                            <td className="px-3 py-2">
-
-                                                <div className="flex gap-1">
+                                                <div className="flex gap-2">
 
                                                     <Link
                                                         to={`/admin/blogs/view/${blog.id}`}
-                                                        className="
-                                                            w-8
-                                                            h-8
-                                                            bg-blue-50
-                                                            text-blue-600
-                                                            rounded-lg
-                                                            flex
-                                                            items-center
-                                                            justify-center
-                                                        "
+                                                        className="p-2 bg-blue-100 rounded"
                                                     >
                                                         <Eye size={14} />
                                                     </Link>
 
                                                     <Link
-                                                        to={`/blog/${blog.slug}`}
-                                                        target="_blank"
-                                                        className="
-                                                            w-8
-                                                            h-8
-                                                            bg-green-50
-                                                            text-green-600
-                                                            rounded-lg
-                                                            flex
-                                                            items-center
-                                                            justify-center
-                                                        "
+                                                        to={`/admin/blogs/edit/${blog.id}`}
+                                                        className="p-2 bg-black text-white rounded"
                                                     >
-                                                        <ExternalLink size={14} />
+                                                        <Pencil size={14} />
                                                     </Link>
 
                                                     <Link
-                                                        to={`/admin/blogs/edit/${blog.id}`}
-                                                        className="
-                                                            w-8
-                                                            h-8
-                                                            bg-black
-                                                            text-white
-                                                            rounded-lg
-                                                            flex
-                                                            items-center
-                                                            justify-center
-                                                        "
+                                                        to={`/blog/${blog.slug}`}
+                                                        target="_blank"
+                                                        className="p-2 bg-green-100 rounded"
                                                     >
-                                                        <Pencil size={14} />
+                                                        <ExternalLink size={14} />
                                                     </Link>
 
                                                     <button
@@ -535,24 +358,12 @@ const BlogList = () => {
                                                                 blog.id
                                                             )
                                                         }
-                                                        className="
-                                                            w-8
-                                                            h-8
-                                                            bg-red-600
-                                                            text-white
-                                                            rounded-lg
-                                                            flex
-                                                            items-center
-                                                            justify-center
-                                                        "
+                                                        className="p-2 bg-red-600 text-white rounded"
                                                     >
                                                         <Trash2 size={14} />
                                                     </button>
-
                                                 </div>
-
                                             </td>
-
                                         </tr>
                                     )
                                 )
