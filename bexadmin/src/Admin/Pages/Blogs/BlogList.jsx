@@ -8,6 +8,8 @@ import {
     Link,
 } from "react-router-dom";
 
+import { API_URL } from "../../../Config/api.jsx";
+
 import {
     Pencil,
     Trash2,
@@ -19,59 +21,34 @@ import AdminLayout from "../../Components/Layout/AdminLayout";
 
 const BlogList = () => {
 
-    const [blogs, setBlogs] =
-        useState([]);
-
-    const [loading, setLoading] =
-        useState(true);
-
-    const [searchTerm, setSearchTerm] =
-        useState("");
-
-    const [sortBy, setSortBy] =
-        useState("newest");
-
+    const [blogs, setBlogs] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [sortBy, setSortBy] = useState("newest");
     useEffect(() => {
-
         fetchBlogs();
-
     }, []);
 
     const fetchBlogs = async () => {
 
         try {
-
-            const response =
-                await fetch(
-                    "http://localhost:5000/admin/blog/list"
-                );
-
-            const result =
-                await response.json();
-
-            if (
-                result.status
-            ) {
-
-                setBlogs(
-                    result.data
-                );
+            const token = localStorage.getItem("token");
+            const response = await fetch(`${API_URL}/admin/blog/list`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            const result = await response.json();
+            if (result.status) {
+                setBlogs(result.data);
             }
-
         } catch (error) {
-
-            console.error(
-                error
-            );
-
+            console.error(error);
         } finally {
-
-            setLoading(
-                false
-            );
+            setLoading(false);
         }
     };
-
     const handleDelete =
         async (id) => {
 
@@ -87,7 +64,7 @@ const BlogList = () => {
 
                 const response =
                     await fetch(
-                        `http://localhost:5000/admin/blog/delete/${id}`,
+                        `${API_URL}/admin/blog/delete/${id}`,
                         {
                             method:
                                 "DELETE",

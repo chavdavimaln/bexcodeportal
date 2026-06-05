@@ -9,83 +9,46 @@ import {
     useNavigate,
 } from "react-router-dom";
 
-import API_URL from "../../../Config/api";
+import { API_URL } from "../../../Config/api";
 
 const Login = () => {
 
     const navigate =
         useNavigate();
 
-    const [form, setForm] =
-        useState({
-            email: "",
-            password: "",
-        });
+    const [form, setForm] = useState({ email: "", password: "", });
 
-    const [message, setMessage] =
-        useState("");
+    const [message, setMessage] = useState("");
 
     const handleSubmit =
         async (e) => {
-
             e.preventDefault();
-
             setMessage("");
-
             try {
-
                 const response =
                     await fetch(
                         `${API_URL}/admin/auth/login`,
                         {
-                            method:
-                                "POST",
-
+                            method: "POST",
                             headers: {
-                                "Content-Type":
-                                    "application/json",
+                                "Content-Type": "application/json",
                             },
-
                             body: JSON.stringify({
-                                email:
-                                    form.email,
-                                password:
-                                    form.password,
+                                email: form.email,
+                                password: form.password,
                             }),
                         }
                     );
 
-                const result =
-                    await response.json();
-
-                if (
-                    !response.ok ||
-                    !result.status
-                ) {
-
-                    setMessage(
-                        result.message ||
-                        "Login failed"
-                    );
-
+                const result = await response.json();
+                if (!response.ok || !result.status) {
+                    setMessage(result.message || "Login failed");
                     return;
                 }
 
-                localStorage.setItem(
-                    "token",
-                    result.data.token
-                );
-
-                localStorage.setItem(
-                    "loggedUser",
-                    JSON.stringify(
-                        result.data.user
-                    )
-                );
-
-                setMessage(
-                    result.message
-                );
+                localStorage.setItem("token", result.data.token);
+                localStorage.setItem("loggedUser", JSON.stringify(result.data.user));
+                setMessage(result.message);
 
                 setTimeout(
                     () => {
