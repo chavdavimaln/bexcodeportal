@@ -203,6 +203,7 @@ const BlogList = () => {
                             bg-red-600
                             text-white
                             rounded-xl
+                            h-[100%]
                         "
                     >
                         Add Blog
