@@ -16,39 +16,41 @@ import {
 } from "lucide-react";
 
 import AdminLayout from "../../Components/Layout/AdminLayout";
+import API_URL from "../../../Config/api";
+
 
 const BlogList = () => {
 
-    const [blogs, setBlogs] =
-        useState([]);
-
-    const [loading, setLoading] =
-        useState(true);
-
-    const [searchTerm, setSearchTerm] =
-        useState("");
-
-    const [sortBy, setSortBy] =
-        useState("newest");
+    const [blogs, setBlogs] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [sortBy, setSortBy] = useState("newest");
 
     useEffect(() => {
-
         fetchBlogs();
-
     }, []);
 
     const fetchBlogs = async () => {
-
         try {
-
+            const token =
+                localStorage.getItem("token");
+                
             const response =
                 await fetch(
-                    "http://localhost:5000/admin/blog/list"
+                    `${API_URL}/admin/blog/list`,
+                    {
+                        method: "GET",
+                        headers: {
+                            contentType:
+                                "application/json",
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
                 );
 
             const result =
                 await response.json();
-
+                console.log("Blog List API Response:", result);
             if (
                 result.status
             ) {
@@ -59,13 +61,11 @@ const BlogList = () => {
             }
 
         } catch (error) {
-
             console.error(
+                "Blog Fetch Error:",
                 error
             );
-
         } finally {
-
             setLoading(
                 false
             );
@@ -85,12 +85,18 @@ const BlogList = () => {
 
             try {
 
+                const  token =
+                    localStorage.getItem("token");
+
                 const response =
                     await fetch(
-                        `http://localhost:5000/admin/blog/delete/${id}`,
+                        `${API_URL}/admin/blog/delete/${id}`,
                         {
                             method:
                                 "DELETE",
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                            },
                         }
                     );
 
@@ -100,12 +106,13 @@ const BlogList = () => {
                 if (
                     result.status
                 ) {
-
+                    alert(
+                        "Blog deleted successfully."
+                    );
                     fetchBlogs();
                 }
 
             } catch (error) {
-
                 console.error(
                     error
                 );
@@ -124,9 +131,7 @@ const BlogList = () => {
 
                 data =
                     data.filter(
-                        (
-                            blog
-                        ) =>
+                        ( blog) =>
                             blog.title
                                 ?.toLowerCase()
                                 .includes(
@@ -218,9 +223,7 @@ const BlogList = () => {
                         <input
                             type="text"
                             placeholder="Search Blog"
-                            value={
-                                searchTerm
-                            }
+                            value={ searchTerm }
                             onChange={(
                                 e
                             ) =>
@@ -238,12 +241,8 @@ const BlogList = () => {
                         />
 
                         <select
-                            value={
-                                sortBy
-                            }
-                            onChange={(
-                                e
-                            ) =>
+                            value={ sortBy }
+                            onChange={(e) =>
                                 setSortBy(
                                     e.target
                                         .value
@@ -321,33 +320,23 @@ const BlogList = () => {
                                 0 ? (
 
                                 filteredBlogs.map(
-                                    (
-                                        blog
-                                    ) => (
+                                    (blog) => (
 
                                         <tr
-                                            key={
-                                                blog.id
-                                            }
+                                            key={blog.id}
                                             className="border-t"
                                         >
 
                                             <td className="p-3">
-                                                {
-                                                    blog.id
-                                                }
+                                                {blog.id}
                                             </td>
 
                                             <td className="p-3">
-                                                {
-                                                    blog.title
-                                                }
+                                                {blog.title}
                                             </td>
 
                                             <td className="p-3">
-                                                {
-                                                    blog.slug
-                                                }
+                                                {blog.slug}
                                             </td>
 
                                             <td className="p-3">
@@ -394,39 +383,28 @@ const BlogList = () => {
                                                     >
                                                         <Trash2 size={14} />
                                                     </button>
-
                                                 </div>
-
                                             </td>
-
                                         </tr>
-
                                     )
                                 )
 
                             ) : (
 
                                 <tr>
-
                                     <td
                                         colSpan="5"
                                         className="text-center p-5"
                                     >
                                         No Blogs Found
                                     </td>
-
                                 </tr>
-
                             )}
 
                         </tbody>
-
                     </table>
-
                 </div>
-
             </div>
-
         </AdminLayout>
     );
 };
