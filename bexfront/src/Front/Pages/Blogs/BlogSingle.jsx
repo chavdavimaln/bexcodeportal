@@ -1,11 +1,13 @@
-// Front/Pages/Blogs/BlogSingle.jsx
+// src/Front/Pages/Blogs/BlogSingle.jsx
 
-import React from "react";
+import React, {
+    useEffect,
+    useState,
+} from "react";
 
 import {
     useParams,
     Navigate,
-    Link,
 } from "react-router-dom";
 
 import {
@@ -22,43 +24,75 @@ import {
 import Header from "../../Components/Header/Header";
 import Footer from "../../Components/Footer/Footer";
 
-/* Import Static Blogs */
-// import BlogContents from "../../../Admin/Pages/Blogs/BlogContents";
+import { API_URL } from "../../../Config/api";
 
 const BlogSingle = () => {
 
     const { slug } = useParams();
 
-    /* Local Storage Blogs */
-    const localBlogs =
-        JSON.parse(
-            localStorage.getItem(
-                "blogContents"
-            )
-        ) || [];
+    const [blog, setBlog] =
+        useState(null);
 
-    /* Merge Blogs */
-    const allBlogs = [
-        ...localBlogs,
-        // ...BlogContents,
-    ];
+    const [loading, setLoading] =
+        useState(true);
 
-    /* Remove Duplicate IDs */
-    const uniqueBlogs = allBlogs.filter(
-        (blog, index, self) =>
-            index ===
-            self.findIndex(
-                (b) => b.id === blog.id
-            )
-    );
+    useEffect(() => {
+        fetchBlog();
+    }, [slug]);
 
-    /* Find Blog */
-    const blog = uniqueBlogs.find(
-        (item) =>
-            item.slug === slug
-    );
+    const fetchBlog = async () => {
 
-    /* Redirect if blog not found */
+        try {
+
+            const response =
+                await fetch(
+                    `${API_URL}/admin/blog/list`
+                );
+
+            const result =
+                await response.json();
+
+            if (
+                result.status
+            ) {
+
+                const foundBlog =
+                    result.data.find(
+                        (item) =>
+                            item.slug === slug
+                    );
+
+                setBlog(
+                    foundBlog || null
+                );
+            }
+
+        } catch (error) {
+
+            console.error(
+                "Blog Fetch Error:",
+                error
+            );
+
+        } finally {
+
+            setLoading(false);
+
+        }
+    };
+
+    if (loading) {
+        return (
+            <>
+                <Header />
+                <div className="py-20 text-center">
+                    Loading...
+                </div>
+                <Footer />
+            </>
+        );
+    }
+
     if (!blog) {
         return (
             <Navigate
@@ -68,17 +102,13 @@ const BlogSingle = () => {
         );
     }
 
-    /* Category Text */
     const categoryText =
         Array.isArray(
             blog.category
         )
-            ? blog.category.join(
-                ", "
-            )
-            : blog.category;
+            ? blog.category.join(", ")
+            : blog.category || "Blog";
 
-    /* Reading Time */
     const plainText =
         blog.content
             ?.replace(
@@ -91,22 +121,18 @@ const BlogSingle = () => {
             )
             .trim() || "";
 
-    const wordsPerMinute =
-        200;
-
     const readingTime =
-        Math.ceil(
-            plainText.split(
-                /\s+/
-            ).length /
-            wordsPerMinute
+        Math.max(
+            1,
+            Math.ceil(
+                plainText.split(/\s+/)
+                    .length / 200
+            )
         );
 
-    /* Current Blog URL */
     const currentUrl =
         `${window.location.origin}/blog/${blog.slug}`;
 
-    /* Encoded Values */
     const encodedUrl =
         encodeURIComponent(
             currentUrl
@@ -117,7 +143,6 @@ const BlogSingle = () => {
             blog.title
         );
 
-    /* Social Share Links */
     const facebookShare =
         `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
 
@@ -127,21 +152,48 @@ const BlogSingle = () => {
     const linkedinShare =
         `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
 
+    const imageUrl =
+        blog.image_full_url
+            ? blog.image_full_url
+            : blog.image_url
+                ? `http://api.bexcod.com${blog.image_url}`
+                : "/no-image.jpg";
+
     return (
         <>
             <Header />
 
-            <section className="relative w-full px-6 md:px-12 2xl:px-14 py-10 md:py-16 bg-[#FFFFFF]">
+            <section
+                className="
+                    relative
+                    w-full
+                    px-6
+                    md:px-12
+                    2xl:px-14
+                    py-10
+                    md:py-16
+                    bg-white
+                "
+            >
 
-                <div className="2xl:max-w-[1270px] max-w-[900px] mx-auto">
+                <div className="max-w-[900px] mx-auto">
 
                     {/* Category */}
                     <div className="mb-6">
-
-                        <span className="inline-flex items-center bg-[#ECEEF2] rounded-[5rem] px-5 py-2 text-[14px] md:text-[18px] font-medium text-black">
+                        <span
+                            className="
+                                inline-flex
+                                items-center
+                                bg-[#ECEEF2]
+                                rounded-full
+                                px-5
+                                py-2
+                                text-sm
+                                font-medium
+                            "
+                        >
                             {categoryText}
                         </span>
-
                     </div>
 
                     {/* Title */}
@@ -150,74 +202,66 @@ const BlogSingle = () => {
                             text-[28px]
                             md:text-[40px]
                             leading-[1.3]
-                            font-normal
-                            text-[#0A0A0A]
                             mb-8
                         "
-                        style={{
-                            fontFamily:
-                                "'Plus Jakarta Sans', sans-serif",
-                        }}
                     >
                         {blog.title}
                     </h1>
 
-                    {/* Blog Image */}
+                    {/* Featured Image */}
                     <figure className="mb-8">
 
                         <img
-                            src={
-                                blog.image
-                            }
-                            alt={
-                                blog.title
-                            }
+                            src={imageUrl}
+                            alt={blog.title}
                             className="
                                 w-full
-                                h-auto
-                                max-h-[600px]
-                                object-cover
                                 rounded-[20px]
+                                object-cover
                             "
                         />
 
                     </figure>
 
-                    {/* Author + Date + Reading Time */}
-                    <div className="flex flex-col md:flex-row md:items-center gap-8 border-b border-black/10 pb-8 mb-8">
+                    {/* Meta */}
+                    <div
+                        className="
+                            flex
+                            flex-col
+                            md:flex-row
+                            gap-8
+                            border-b
+                            pb-8
+                            mb-8
+                        "
+                    >
 
-                        {/* Author */}
                         <div>
-
-                            <h4 className="text-[#212529] text-[18px] font-medium">
+                            <h4 className="font-medium">
                                 {blog.author ||
                                     "Admin"}
                             </h4>
 
-                            <p className="text-[#6A7282] text-[14px] mt-1">
-                                {blog.designation ||
-                                    "Content Writer"}
+                            <p className="text-gray-500 text-sm">
+                                Content Writer
                             </p>
-
                         </div>
 
-                        {/* Publish Date */}
-                        <div className="flex items-center gap-3 text-[#4A5565] text-[16px]">
-
+                        <div className="flex items-center gap-2">
                             <CalendarDays
                                 size={18}
                             />
 
                             <span>
-                                {
-                                    blog.date
-                                }
+                                {blog.display_date
+                                    ? new Date(
+                                        blog.display_date
+                                    ).toLocaleDateString()
+                                    : ""}
                             </span>
-
                         </div>
 
-                        {/* Reading Time */}
-                        <div className="flex items-center gap-3 text-[#4A5565] text-[16px]">
+                        <div className="flex items-center gap-2">
 
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -227,23 +271,18 @@ const BlogSingle = () => {
                                 fill="none"
                                 stroke="currentColor"
                                 strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
                             >
                                 <circle
                                     cx="12"
                                     cy="12"
                                     r="10"
                                 />
-
                                 <polyline points="12 6 12 12 16 14" />
-
                             </svg>
 
                             <span>
-                                {
-                                    readingTime
-                                }{" "}
+                                {readingTime}
+                                {" "}
                                 min read
                             </span>
 
@@ -251,143 +290,96 @@ const BlogSingle = () => {
 
                     </div>
 
-                    {/* Social Share */}
+                    {/* Share */}
                     <div
                         className="
                             inline-flex
-                            flex-wrap
                             items-center
                             gap-3
                             border
-                            border-[#0000002B]
-                            rounded-[7px]
-                            px-[10px]
-                            py-[10px]
+                            rounded-lg
+                            px-3
+                            py-3
                             mb-10
                         "
                     >
 
-                        {/* Share Text */}
-                        <div className="flex items-center gap-2 pr-2">
-
-                            <Share2
-                                size={18}
-                                className="text-[#0A0A0A]"
-                            />
-
-                            <span className="text-[16px] font-medium text-[#0A0A0A]">
+                        <div className="flex items-center gap-2">
+                            <Share2 size={18} />
+                            <span>
                                 Share
                             </span>
-
                         </div>
 
-                        {/* Facebook */}
-                        <Link
-                            to={facebookShare}
+                        <a
+                            href={facebookShare}
                             target="_blank"
-                            rel="noopener noreferrer"
+                            rel="noreferrer"
                             className="
-                                w-[40px]
-                                h-[40px]
+                                w-10
+                                h-10
                                 rounded-full
                                 bg-[#EA3C26]
+                                text-white
                                 flex
                                 items-center
                                 justify-center
-                                text-white
-                                hover:bg-black
-                                transition
                             "
                         >
+                            <FaFacebookF />
+                        </a>
 
-                            <FaFacebookF
-                                size={16}
-                            />
-
-                        </Link>
-
-                        {/* Twitter */}
-                        <Link
-                            to={twitterShare}
+                        <a
+                            href={twitterShare}
                             target="_blank"
-                            rel="noopener noreferrer"
+                            rel="noreferrer"
                             className="
-                                w-[40px]
-                                h-[40px]
+                                w-10
+                                h-10
                                 rounded-full
                                 bg-[#EA3C26]
+                                text-white
                                 flex
                                 items-center
                                 justify-center
-                                text-white
-                                hover:bg-black
-                                transition
                             "
                         >
+                            <FaTwitter />
+                        </a>
 
-                            <FaTwitter
-                                size={16}
-                            />
-
-                        </Link>
-
-                        {/* LinkedIn */}
-                        <Link
-                            to={linkedinShare}
+                        <a
+                            href={linkedinShare}
                             target="_blank"
-                            rel="noopener noreferrer"
+                            rel="noreferrer"
                             className="
-                                w-[40px]
-                                h-[40px]
+                                w-10
+                                h-10
                                 rounded-full
                                 bg-[#EA3C26]
+                                text-white
                                 flex
                                 items-center
                                 justify-center
-                                text-white
-                                hover:bg-black
-                                transition
                             "
                         >
-
-                            <FaLinkedinIn
-                                size={16}
-                            />
-
-                        </Link>
+                            <FaLinkedinIn />
+                        </a>
 
                     </div>
 
-                    {/* Blog Content */}
+                    {/* Content */}
                     <div
                         className="blog-content"
                         dangerouslySetInnerHTML={{
                             __html:
-                                blog.content
-
-                                    .replace(
-                                        /<(?!h1|h2|h3|h4|h5|h6)([^>]+)\sstyle="[^"]*"/gi,
-                                        "<$1"
-                                    )
-
-                                    .replace(
-                                        /<span[^>]*>/gi,
-                                        ""
-                                    )
-
-                                    .replace(
-                                        /<\/span>/gi,
-                                        ""
-                                    )
-
-                                    .replace(
-                                        /<p>(\s|&nbsp;)*<\/p>/gi,
-                                        ""
-                                    ),
+                                blog.content || "",
                         }}
                     />
+
                 </div>
+
             </section>
+
             <Footer />
         </>
     );

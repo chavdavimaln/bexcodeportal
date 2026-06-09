@@ -1,13 +1,12 @@
 // Front/Pages/Blogs/BlogList.jsx
 
 import React, {
-    useEffect,
     useMemo,
     useState,
 } from "react";
 
 import { Link } from "react-router-dom";
-import { API_URL } from "../../../Config/api";
+
 // import BlogContents from "../../../Admin/Pages/Blogs/BlogContents";
 
 const BlogList = () => {
@@ -44,60 +43,33 @@ const BlogList = () => {
             .trim();
     };
 
+    /* Local Storage Blogs */
+    const localBlogs =
+        JSON.parse(
+            localStorage.getItem(
+                "blogContents"
+            )
+        ) || [];
 
-    const [blogs, setBlogs] =
-        useState([]);
+    /* Merge Static + Dynamic Blogs */
+    const allBlogs = [
+        ...localBlogs,
+        // ...BlogContents,
+    ];
 
-    const [loading, setLoading] =
-        useState(true);
+    /* Remove Duplicate IDs */
+    const uniqueBlogs = allBlogs.filter(
+        (blog, index, self) =>
+            index ===
+            self.findIndex(
+                (b) => b.id === blog.id
+            )
+    );
 
-    useEffect(() => {
-        fetchBlogs();
-    }, []);
-
-    const fetchBlogs = async () => {
-
-        try {
-
-            const response =
-                await fetch(
-                    `${API_URL}/admin/blog/list`
-                );
-
-            const result =
-                await response.json();
-
-            console.log(
-                "Blogs API Response:",
-                result
-            );
-
-            if (result.status) {
-
-                const sortedBlogs =
-                    result.data.sort(
-                        (a, b) =>
-                            b.id - a.id
-                    );
-
-                setBlogs(
-                    sortedBlogs
-                );
-            }
-
-        } catch (error) {
-
-            console.error(
-                "Blog Fetch Error:",
-                error
-            );
-
-        } finally {
-
-            setLoading(false);
-
-        }
-    };
+    /* Latest First */
+    const blogs = uniqueBlogs.sort(
+        (a, b) => b.id - a.id
+    );
 
     /* Filters */
     const filters = [
@@ -223,13 +195,14 @@ const BlogList = () => {
                                     transition
                                     whitespace-nowrap
 
-                                    ${activeFilter ===
+                                    ${
+                                        activeFilter ===
                                         filter
-                                        ? `
+                                            ? `
                                                 bg-[#FF2300]
                                                 text-white
                                               `
-                                        : `
+                                            : `
                                                 text-[#0A0A0A]
                                                 hover:text-[#FF2300]
                                               `
@@ -298,10 +271,11 @@ const BlogList = () => {
 
                                         <img
                                             src={
-                                                blog.image_full_url ||
-                                                `http://api.bexcod.com${blog.image_url || ""}`
+                                                blog.image
                                             }
-                                            alt={blog.title}
+                                            alt={
+                                                blog.title
+                                            }
                                             className="
                                                 w-full
                                                 h-[185px]
@@ -356,11 +330,7 @@ const BlogList = () => {
 
                                     {/* Date */}
                                     <p className="mt-2 text-[13px] text-[#999]">
-                                        {blog.display_date
-                                            ? new Date(
-                                                blog.display_date
-                                            ).toLocaleDateString()
-                                            : ""}
+                                        {blog.date}
                                     </p>
 
                                     {/* Excerpt */}
@@ -425,25 +395,25 @@ const BlogList = () => {
             {/* No Blogs */}
             {filteredBlogs.length ===
                 0 && (
-                    <div className="text-center text-[18px] text-[#717182] mt-10">
-                        No blogs found.
-                    </div>
-                )}
+                <div className="text-center text-[18px] text-[#717182] mt-10">
+                    No blogs found.
+                </div>
+            )}
 
             {/* Load More */}
             {visibleBlogs <
                 filteredBlogs.length && (
 
-                    <div className="w-full flex justify-center mt-10">
+                <div className="w-full flex justify-center mt-10">
 
-                        <button
-                            onClick={() =>
-                                setVisibleBlogs(
-                                    (prev) =>
-                                        prev + 6
-                                )
-                            }
-                            className="
+                    <button
+                        onClick={() =>
+                            setVisibleBlogs(
+                                (prev) =>
+                                    prev + 6
+                            )
+                        }
+                        className="
                             px-8
                             py-3
                             rounded-full
@@ -454,13 +424,13 @@ const BlogList = () => {
                             hover:bg-[#EA3C26]
                             transition
                         "
-                        >
-                            Load More
-                        </button>
+                    >
+                        Load More
+                    </button>
 
-                    </div>
+                </div>
 
-                )}
+            )}
 
         </section>
     );

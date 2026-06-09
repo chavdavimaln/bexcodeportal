@@ -1,6 +1,13 @@
 import React from "react";
 
 import AdminLayout from "../../Components/Layout/AdminLayout";
+import {
+    Pencil,
+} from "lucide-react";
+
+import {
+    Link,
+} from "react-router-dom";
 
 const UserProfile = () => {
 
@@ -82,7 +89,24 @@ const UserProfile = () => {
                                     loggedUser.role
                                 }
                             </p>
-
+                            <Link
+                                to={`/admin/users/edit/${loggedUser.id}`}
+                                className="
+                                    w-8
+                                    h-8
+                                    rounded-lg
+                                    bg-black
+                                    text-white
+                                    flex
+                                    items-center
+                                    justify-center
+                                    hover:bg-gray-700
+                                    transition
+                                "
+                                title="Edit"
+                            >
+                                <Pencil size={14} />
+                            </Link>
                         </div>
 
                     </div>
