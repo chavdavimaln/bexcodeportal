@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from "react";
 import AdminLayout from "../../Components/Layout/AdminLayout";
 import { API_URL } from "../../../Config/api";
+import {
+    Eye,
+    Pencil,
+    Trash2,
+} from "lucide-react";
+import {
+    Link,
+} from "react-router-dom";
 
 const UserList = () => {
     const [users, setUsers] = useState([]);
@@ -38,7 +46,30 @@ const UserList = () => {
             setLoading(false);
         }
     };
+    const handleDelete = (id) => {
 
+        const confirmDelete =
+            window.confirm(
+                "Delete this user?"
+            );
+
+        if (!confirmDelete) return;
+
+        const updatedUsers =
+            users.filter(
+                (item) =>
+                    item.id !== id
+            );
+
+        localStorage.setItem(
+            "users",
+            JSON.stringify(
+                updatedUsers
+            )
+        );
+
+        setUsers(updatedUsers);
+    };
     return (
         <AdminLayout>
             <div>
@@ -66,6 +97,7 @@ const UserList = () => {
                                 <th className="p-3 text-left">Role</th>
                                 <th className="p-3 text-left">Status</th>
                                 <th className="p-3 text-left">Created</th>
+                                <th className="p-3 text-left">Actions</th>
                             </tr>
                         </thead>
 
@@ -124,6 +156,69 @@ const UserList = () => {
                                             {new Date(
                                                 user.created_at
                                             ).toLocaleDateString()}
+                                        </td>
+                                        <td className="p-3">
+                                            <div className="flex items-center gap-2">
+
+                                                <Link
+                                                    to={`/admin/users/profile/${user.id}`}
+                                                    className="
+                                                                w-8
+                                                                h-8
+                                                                rounded-lg
+                                                                bg-blue-50
+                                                                text-blue-600
+                                                                flex
+                                                                items-center
+                                                                justify-center
+                                                                hover:bg-blue-600
+                                                                hover:text-white
+                                                                transition
+                                                            "
+                                                    title="View"
+                                                >
+                                                    <Eye size={14} />
+                                                </Link>
+
+                                                <Link
+                                                    to={`/admin/users/edit/${user.id}`}
+                                                    className="
+                                                                w-8
+                                                                h-8
+                                                                rounded-lg
+                                                                bg-black
+                                                                text-white
+                                                                flex
+                                                                items-center
+                                                                justify-center
+                                                                hover:bg-gray-700
+                                                                transition
+                                                            "
+                                                    title="Edit"
+                                                >
+                                                    <Pencil size={14} />
+                                                </Link>
+
+                                                <button
+                                                    onClick={() => handleDelete(user.id)}
+                                                    className="
+                                                                w-8
+                                                                h-8
+                                                                rounded-lg
+                                                                bg-red-600
+                                                                text-white
+                                                                flex
+                                                                items-center
+                                                                justify-center
+                                                                hover:bg-red-700
+                                                                transition
+                                                            "
+                                                    title="Delete"
+                                                >
+                                                    <Trash2 size={14} />
+                                                </button>
+
+                                            </div>
                                         </td>
                                     </tr>
                                 ))
