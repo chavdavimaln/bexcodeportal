@@ -17,7 +17,7 @@ import {
 
 import AdminLayout from "../../Components/Layout/AdminLayout";
 import { API_URL } from "../../../Config/api";
-
+import { apiRequest } from "../../utils/api.interceptors.js";
 
 const BlogList = () => {
 
@@ -29,49 +29,62 @@ const BlogList = () => {
     useEffect(() => {
         fetchBlogs();
     }, []);
-
-    const fetchBlogs = async () => {
-        try {
-            const token =
-                localStorage.getItem("token");
-
-            const response =
-                await fetch(
-                    `${API_URL}/admin/blog/list`,
-                    {
-                        method: "GET",
-                        headers: {
-                            contentType:
-                                "application/json",
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
+    /*
+        const fetchBlogs = async () => {
+            try {
+                const token =
+                    localStorage.getItem("token");
+    
+                const response =
+                    await fetch(
+                        `${API_URL}/admin/blog/list`,
+                        {
+                            method: "GET",
+                            headers: {
+                                contentType:
+                                    "application/json",
+                                Authorization: `Bearer ${token}`,
+                            },
+                        }
+                    );
+    
+                const result =
+                    await response.json();
+                console.log("Blog List API Response:", result);
+                if (
+                    result.status
+                ) {
+    
+                    setBlogs(
+                        result.data
+                    );
+                }
+    
+            } catch (error) {
+                console.error(
+                    "Blog Fetch Error:",
+                    error
                 );
-
-            const result =
-                await response.json();
-            console.log("Blog List API Response:", result);
-            if (
-                result.status
-            ) {
-
-                setBlogs(
-                    result.data
+            } finally {
+                setLoading(
+                    false
                 );
             }
-
+        };
+    */
+    const fetchBlogs = async () => {
+        try {
+            const result = await apiRequest("/admin/blog/list", { method: "GET" });
+            console.log("Blog List API Response:", result);
+            if (result?.status) {
+                setBlogs(result.data);
+            }
         } catch (error) {
-            console.error(
-                "Blog Fetch Error:",
-                error
-            );
+            console.error("Blog Fetch Error:", error);
         } finally {
-            setLoading(
-                false
-            );
+            setLoading(false);
         }
     };
-
     const handleDelete =
         async (id) => {
 
