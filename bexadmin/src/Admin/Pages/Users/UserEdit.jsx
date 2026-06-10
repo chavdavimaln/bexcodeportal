@@ -1,4 +1,4 @@
-// Admin/Pages/Users/UserEdit.jsx
+// src/Admin/Pages/Users/UserEdit.jsx
 
 import React, {
     useEffect,
@@ -11,88 +11,163 @@ import {
 } from "react-router-dom";
 
 import AdminLayout from "../../Components/Layout/AdminLayout";
+import { API_URL } from "../../../Config/api";
 
 const UserEdit = () => {
 
     const { id } = useParams();
-
     const navigate = useNavigate();
 
-    const [form, setForm] =
-        useState({});
+    const [loading, setLoading] = useState(true);
+
+    const [form, setForm] = useState({
+        username: "",
+        fname: "",
+        lname: "",
+        email: "",
+        phone: "",
+        role: "",
+        user_status: "",
+        dob: "",
+    });
 
     useEffect(() => {
-
-        const users =
-            JSON.parse(
-                localStorage.getItem(
-                    "users"
-                )
-            ) || [];
-
-        const user =
-            users.find(
-                (item) =>
-                    item.id ===
-                    Number(id)
-            );
-
-        if (user) {
-            setForm(user);
-        }
-
+        fetchUser();
     }, [id]);
 
-    const handleImage = (e) => {
+    const fetchUser = async () => {
 
-        const file =
-            e.target.files[0];
+        try {
 
-        if (!file) return;
+            const token =
+                localStorage.getItem("token");
 
-        const reader =
-            new FileReader();
+            const response =
+                await fetch(
+                    `${API_URL}/admin/auth/details/${id}`,
+                    {
+                        headers: {
+                            Authorization:
+                                `Bearer ${token}`,
+                        },
+                    }
+                );
 
-        reader.onloadend = () => {
+            const result =
+                await response.json();
 
-            setForm({
-                ...form,
-                profile:
-                    reader.result,
-            });
-        };
+            console.log(
+                "User Details:",
+                result
+            );
 
-        reader.readAsDataURL(file);
+            if (
+                result.status &&
+                result.data.user.length
+            ) {
+
+                const user =
+                    result.data.user[0];
+
+                setForm({
+                    username:
+                        user.username || "",
+                    fname:
+                        user.fname || "",
+                    lname:
+                        user.lname || "",
+                    email:
+                        user.email || "",
+                    phone:
+                        user.phone || "",
+                    role:
+                        user.role || "",
+                    user_status:
+                        user.user_status || "",
+                    dob:
+                        user.dob || "",
+                });
+            }
+
+        } catch (error) {
+
+            console.error(
+                "User Fetch Error:",
+                error
+            );
+
+        } finally {
+
+            setLoading(false);
+        }
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
 
         e.preventDefault();
 
-        const users =
-            JSON.parse(
-                localStorage.getItem(
-                    "users"
-                )
-            ) || [];
+        try {
 
-        const updatedUsers =
-            users.map((item) =>
-                item.id ===
-                    Number(id)
-                    ? form
-                    : item
+            const token =
+                localStorage.getItem("token");
+
+            const response =
+                await fetch(
+                    `${API_URL}/admin/auth/update/${id}`,
+                    {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type":
+                                "application/json",
+                            Authorization:
+                                `Bearer ${token}`,
+                        },
+                        body: JSON.stringify(
+                            form
+                        ),
+                    }
+                );
+
+            const result =
+                await response.json();
+
+            if (result.status) {
+
+                alert(
+                    "User updated successfully."
+                );
+
+                navigate(
+                    "/admin/users"
+                );
+
+            } else {
+
+                alert(
+                    result.message
+                );
+            }
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert(
+                "Unable to update user."
             );
-
-        localStorage.setItem(
-            "users",
-            JSON.stringify(
-                updatedUsers
-            )
-        );
-
-        navigate("/admin/users");
+        }
     };
+
+    if (loading) {
+
+        return (
+            <AdminLayout>
+                <div className="p-10">
+                    Loading...
+                </div>
+            </AdminLayout>
+        );
+    }
 
     return (
         <AdminLayout>
@@ -104,9 +179,7 @@ const UserEdit = () => {
                 </h2>
 
                 <form
-                    onSubmit={
-                        handleSubmit
-                    }
+                    onSubmit={handleSubmit}
                     className="
                         bg-white
                         rounded-3xl
@@ -119,18 +192,15 @@ const UserEdit = () => {
 
                     <div className="grid md:grid-cols-2 gap-6">
 
-                        {/* Username */}
                         <div>
-                            <label className="block text-sm font-medium mb-2">
+
+                            <label className="block mb-2">
                                 Username
                             </label>
 
                             <input
                                 type="text"
-                                value={
-                                    form.username ||
-                                    ""
-                                }
+                                value={form.username}
                                 onChange={(e) =>
                                     setForm({
                                         ...form,
@@ -140,66 +210,60 @@ const UserEdit = () => {
                                 }
                                 className="w-full border rounded-xl px-4 py-3"
                             />
+
                         </div>
 
-                        {/* First Name */}
                         <div>
-                            <label className="block text-sm font-medium mb-2">
+
+                            <label className="block mb-2">
                                 First Name
                             </label>
 
                             <input
                                 type="text"
-                                value={
-                                    form.firstName ||
-                                    ""
-                                }
+                                value={form.fname}
                                 onChange={(e) =>
                                     setForm({
                                         ...form,
-                                        firstName:
+                                        fname:
                                             e.target.value,
                                     })
                                 }
                                 className="w-full border rounded-xl px-4 py-3"
                             />
+
                         </div>
 
-                        {/* Last Name */}
                         <div>
-                            <label className="block text-sm font-medium mb-2">
+
+                            <label className="block mb-2">
                                 Last Name
                             </label>
 
                             <input
                                 type="text"
-                                value={
-                                    form.lastName ||
-                                    ""
-                                }
+                                value={form.lname}
                                 onChange={(e) =>
                                     setForm({
                                         ...form,
-                                        lastName:
+                                        lname:
                                             e.target.value,
                                     })
                                 }
                                 className="w-full border rounded-xl px-4 py-3"
                             />
+
                         </div>
 
-                        {/* Email */}
                         <div>
-                            <label className="block text-sm font-medium mb-2">
-                                Email Address
+
+                            <label className="block mb-2">
+                                Email
                             </label>
 
                             <input
                                 type="email"
-                                value={
-                                    form.email ||
-                                    ""
-                                }
+                                value={form.email}
                                 onChange={(e) =>
                                     setForm({
                                         ...form,
@@ -209,19 +273,59 @@ const UserEdit = () => {
                                 }
                                 className="w-full border rounded-xl px-4 py-3"
                             />
+
                         </div>
 
-                        {/* Role */}
                         <div>
-                            <label className="block text-sm font-medium mb-2">
-                                User Role
+
+                            <label className="block mb-2">
+                                Phone
+                            </label>
+
+                            <input
+                                type="text"
+                                value={form.phone}
+                                onChange={(e) =>
+                                    setForm({
+                                        ...form,
+                                        phone:
+                                            e.target.value,
+                                    })
+                                }
+                                className="w-full border rounded-xl px-4 py-3"
+                            />
+
+                        </div>
+
+                        <div>
+
+                            <label className="block mb-2">
+                                Date of Birth
+                            </label>
+
+                            <input
+                                type="date"
+                                value={form.dob}
+                                onChange={(e) =>
+                                    setForm({
+                                        ...form,
+                                        dob:
+                                            e.target.value,
+                                    })
+                                }
+                                className="w-full border rounded-xl px-4 py-3"
+                            />
+
+                        </div>
+
+                        <div>
+
+                            <label className="block mb-2">
+                                Role
                             </label>
 
                             <select
-                                value={
-                                    form.role ||
-                                    ""
-                                }
+                                value={form.role}
                                 onChange={(e) =>
                                     setForm({
                                         ...form,
@@ -231,50 +335,49 @@ const UserEdit = () => {
                                 }
                                 className="w-full border rounded-xl px-4 py-3"
                             >
-                                <option>
+                                <option value="admin">
                                     Admin
                                 </option>
 
-                                <option>
-                                    Blogger
+                                <option value="editor">
+                                    Editor
                                 </option>
-
                             </select>
+
                         </div>
 
-                        {/* Profile */}
                         <div>
-                            <label className="block text-sm font-medium mb-2">
-                                Profile Picture
+
+                            <label className="block mb-2">
+                                Status
                             </label>
 
-                            <input
-                                type="file"
-                                onChange={
-                                    handleImage
+                            <select
+                                value={form.user_status}
+                                onChange={(e) =>
+                                    setForm({
+                                        ...form,
+                                        user_status:
+                                            e.target.value,
+                                    })
                                 }
                                 className="w-full border rounded-xl px-4 py-3"
-                            />
+                            >
+                                <option value="active">
+                                    Active
+                                </option>
+
+                                <option value="inactive">
+                                    Inactive
+                                </option>
+                            </select>
+
                         </div>
 
                     </div>
 
-                    {/* Preview */}
-                    {form.profile && (
-                        <img
-                            src={form.profile}
-                            alt=""
-                            className="
-                                w-[120px]
-                                h-[120px]
-                                rounded-2xl
-                                object-cover
-                                border
-                            "
-                        />
-                    )}
-
                     <button
+                        type="submit"
                         className="
                             px-8
                             py-3

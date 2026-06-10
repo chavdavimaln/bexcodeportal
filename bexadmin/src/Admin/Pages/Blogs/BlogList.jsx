@@ -364,12 +364,12 @@ const BlogList = () => {
 
                                                 <div className="flex gap-2">
 
-                                                    <Link
+                                                    {/* <Link
                                                         to={`/admin/blogs/view/${blog.id}`}
                                                         className="p-2 bg-blue-100 rounded"
                                                     >
                                                         <Eye size={14} />
-                                                    </Link>
+                                                    </Link> */}
 
                                                     <Link
                                                         to={`/admin/blogs/edit/${blog.id}`}
