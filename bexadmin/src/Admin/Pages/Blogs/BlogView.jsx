@@ -39,23 +39,23 @@ const BlogView = () => {
                 String(item.id) ===
                 String(id)
         );
-        /* Category Text */
-const categoryText =
-    Array.isArray(blog?.category)
-        ? blog.category.join(", ")
-        : blog?.category;
+    /* Category Text */
+    const categoryText =
+        Array.isArray(blog?.category)
+            ? blog.category.join(", ")
+            : blog?.category;
 
-/* Reading Time */
-const plainText =
-    blog?.content
-        ?.replace(/<[^>]+>/g, "")
-        .replace(/&nbsp;/g, " ")
-        .trim() || "";
+    /* Reading Time */
+    const plainText =
+        blog?.content
+            ?.replace(/<[^>]+>/g, "")
+            .replace(/&nbsp;/g, " ")
+            .trim() || "";
 
-const readingTime =
-    Math.ceil(
-        plainText.split(/\s+/).length / 200
-    );
+    const readingTime =
+        Math.ceil(
+            plainText.split(/\s+/).length / 200
+        );
 
     /* Current URL */
     const currentUrl =
