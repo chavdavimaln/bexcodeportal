@@ -20,7 +20,7 @@ export const apiRequest = async ( endpoint, options = {} ) => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
 
-        window.location.href = "/login";
+        window.location.href = "/admin/login";
 
         return;
     }
@@ -28,7 +28,7 @@ export const apiRequest = async ( endpoint, options = {} ) => {
     return response.json();
 };
 
-export const apiRequestWithRequest = async ( endpoint, options = {} ) => {
+export const apiRequestWithFileRequest = async ( endpoint, options = {} ) => {
     const token = localStorage.getItem("token");
 
     const response = await fetch(
@@ -48,7 +48,7 @@ export const apiRequestWithRequest = async ( endpoint, options = {} ) => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
 
-        window.location.href = "/login";
+        window.location.href = "/admin/login";
 
         return;
     }

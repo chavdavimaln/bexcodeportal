@@ -1,24 +1,22 @@
 // Admin/Pages/Blogs/BlogAdd.jsx
 
-import React, { useMemo, useRef, useState, } from "react";
+import React, { useMemo, useRef, useState, useEffect, useCallback } from "react";
 
 import { useNavigate } from "react-router-dom";
-
 import { Check, X, } from "lucide-react";
-
 import AdminLayout from "../../Components/Layout/AdminLayout";
 
-import BlogContents from "./BlogContents";
+// import BlogContents from "./BlogContents";
 
 import JoditEditor from "jodit-react";
-import { apiRequest, apiRequestWithRequest } from "../../utils/api.interceptors.js";
+import { apiRequest, apiRequestWithFileRequest } from "../../utils/api.interceptors.js";
+import toast from "react-hot-toast";
 
 // import API_URL from "../../../Config/api";
 
 const BlogAdd = () => {
 
     const navigate = useNavigate();
-
     const editor = useRef(null);
 
     /* Input Refs */
@@ -26,38 +24,11 @@ const BlogAdd = () => {
     const imageRef = useRef(null);
     const dateRef = useRef(null);
     const categoryRef = useRef(null);
-    const authorRef = useRef(null);
-    const designationRef = useRef(null);
+    // const authorRef = useRef(null);
+    // const designationRef = useRef(null);
+    const [categoryOptions, setCategoryOptions] = useState([]);
+    const [categories, setCategories] = useState([]);
 
-    /* Local Storage Blogs */
-    const localBlogs = useMemo(() => {
-
-        return (
-            JSON.parse(
-                localStorage.getItem(
-                    "blogContents"
-                )
-            ) || []
-        );
-
-    }, []);
-
-    /* Merge Static + Dynamic Blogs */
-    const allBlogs = useMemo(() => {
-
-        return [
-            ...localBlogs,
-            ...BlogContents,
-        ];
-
-    }, [localBlogs]);
-
-
-    const categoryOptions = JSON.parse(
-        localStorage.getItem("blogCategories")
-    )?.map(
-        (item) => item.name
-    ) || [];
     /* Editor Config */
     const config = useMemo(() => ({
         readonly: false,
@@ -81,19 +52,13 @@ const BlogAdd = () => {
         });
 
     const [categoryInput, setCategoryInput] = useState("");
-    const [categories, setCategories] = useState([]);
     const [message, setMessage] = useState("");
     const [errors, setErrors] = useState({});
 
     /* Normalize Text */
-    const normalizeText = (value) => {
-        return value?.toLowerCase().trim().replace(/\s+/g, " ");
-    };
-
-    /* Duplicate Blog Check */
-    const isDuplicateTitle = allBlogs.some((blog) =>
-        normalizeText(blog.title) === normalizeText(form.title)
-    );
+    // const normalizeText = (value) => {
+    //     return value?.toLowerCase().trim().replace(/\s+/g, " ");
+    // };
 
     /* Scroll To Field */
     const scrollToField = (ref) => {
@@ -108,40 +73,99 @@ const BlogAdd = () => {
         ref.current.focus();
     };
 
-    /* Add Category */
-    const addCategory = () => {
+    const fetchCategories = useCallback(async () => {
+        try {
+            const result = await apiRequest(
+                "/admin/category/list",
+                {
+                    method: "GET",
+                }
+            );
+            console.log(result.data);
+            if (result.status) {
+                setCategoryOptions(result.data.category);
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }, []);
 
+    useEffect(() => {
+        fetchCategories();
+    }, [fetchCategories]);
+
+    /* Add Category */
+
+    const addCategory = async () => {
         const value = categoryInput.trim();
+
         if (!value) return;
-        const alreadyExists = categories.some((cat) => normalizeText(cat) === normalizeText(value));
+
+        const alreadyExists = categoryOptions.some(
+            (cat) =>
+                cat.name.toLowerCase() === value.toLowerCase()
+        );
 
         if (alreadyExists) {
-            setErrors({ category: "Category already added.", });
+            setErrors({
+                category: "Category already exists.",
+            });
             return;
         }
-        setCategories([...categories, value,]);
-        setCategoryInput("");
-        setErrors((prev) => ({ ...prev, category: "", }));
-    };
 
-    /* Toggle Category */
-    const toggleCategory = (category) => {
+        try {
+            const result = await apiRequest(
+                "/admin/category/create",
+                {
+                    method: "POST",
+                    body: JSON.stringify({
+                        name: value,
+                    }),
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
 
-        const exists = categories.includes(category);
+            if (result.status) {
+                const newCategory = result.data.category[0];
 
-        if (exists) {
-            setCategories(categories.filter((item) => item !== category));
-        } else {
-            setCategories([...categories, category,]);
+                // Add to category list
+                setCategoryOptions((prev) => [
+                    ...prev,
+                    newCategory,
+                ]);
+
+                // Auto-select category
+                setCategories((prev) => [
+                    ...prev,
+                    newCategory,
+                ]);
+
+                setCategoryInput("");
+                setErrors((prev) => ({
+                    ...prev,
+                    category: "",
+                }));
+            } else {
+                setErrors({
+                    category:
+                        result.message ||
+                        "Failed to create category",
+                });
+            }
+        } catch (error) {
+            console.error(error);
+
+            setErrors({
+                category: "Something went wrong",
+            });
         }
-
-        setErrors((prev) => ({ ...prev, category: "", }));
     };
 
-    /* Remove Category */
-    const removeCategory = (item) => {
-        setCategories(
-            categories.filter((cat) => cat !== item)
+    const toggleCategory = (category) => {
+        setCategories((prev) =>
+            prev.some((item) => item.id === category.id) ? prev.filter((item) => item.id !== category.id) : [...prev, category]
         );
     };
 
@@ -209,10 +233,12 @@ const BlogAdd = () => {
         if (form.title.trim() === "") {
             newErrors.title = "Blog title is required.";
             scrollToField(titleRef);
-        } else if (isDuplicateTitle) {
-            newErrors.title = "Blog is already added.";
-            scrollToField(titleRef);
-        } else if (!form.image_url) {
+        }
+        // else if (isDuplicateTitle) {
+        //     newErrors.title = "Blog is already added.";
+        //     scrollToField(titleRef);
+        // } 
+        else if (!form.image_url) {
             newErrors.image_url = "Blog image is required.";
             scrollToField(imageRef);
         } else if (form.date.trim() === "") {
@@ -238,22 +264,9 @@ const BlogAdd = () => {
         if (Object.keys(newErrors).length > 0) {
             return;
         }
-
-        const newBlog = {
-            // id: Date.now(),
-            // slug: form.title.toLowerCase().trim().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-"),
-            title: form.title,
-            content: form.content,
-            image_url: form.image_url,
-            display_date: form.date,
-            category_ids: "",
-            blog_status: "publish",
-            category: categories,
-            // author: form.author,
-            designation: "",
-
-        };
-
+        const category_ids = categories.map(
+            (item) => item.id
+        );
         const formData = new FormData();
 
         formData.append("title", form.title);
@@ -262,28 +275,12 @@ const BlogAdd = () => {
         formData.append("author", form.author);
         formData.append("designation", form.designation);
         formData.append("content", form.content);
-        formData.append("category", JSON.stringify(categories));
-
-
-        { /*   
-           try {
-   
-               const oldBlogs = JSON.parse(localStorage.getItem("blogContents")) || [];
-               oldBlogs.unshift(newBlog);
-               localStorage.setItem("blogContents", JSON.stringify(oldBlogs));
-               setMessage("Blog Added Successfully!");
-               setTimeout(() => {
-                   navigate("/admin/blogs");
-               }, 1000);
-   
-           } catch (error) {
-               console.error(error);
-               setErrors({ storage: "Storage limit exceeded. Please delete some old blogs or use smaller images.", });
-           } 
-           */}
-
+        formData.append("category_ids", category_ids.join(','));
+        // console.log(JSON.stringify(categories));
+        // console.log(category_ids.join(','));
+        // return false;
         try {
-            const result = await apiRequestWithRequest("/admin/blog/create", {
+            const result = await apiRequestWithFileRequest("/admin/blog/create", {
                 method: "POST",
                 // body: JSON.stringify(newBlog),
                 body: formData,
@@ -291,19 +288,18 @@ const BlogAdd = () => {
 
             if (result.status) {
                 setMessage("Blog Added Successfully!");
-
+                toast.success("Blog Added successfully.");
                 setTimeout(() => {
                     navigate("/admin/blogs");
                 }, 1000);
             } else {
-                setErrors({
-                    api: result.message,
-                });
+                setErrors({ api: result.message, });
+                toast.error(result.message);
             }
         } catch (error) {
             console.error(error);
+            toast.error("Unable to create blog");
         }
-
     };
 
     return (
@@ -315,26 +311,11 @@ const BlogAdd = () => {
                     Add Blog
                 </h1>
 
-                <div
-                    className="
-                        bg-white
-                        border
-                        border-black/10
-                        rounded-[25px]
-                        p-6
-                        md:p-8
-                    "
-                >
-                    <form
-                        onSubmit={
-                            handleSubmit
-                        }
-                        className="space-y-6"
-                    >
+                <div className="bg-white border border-black/10 rounded-[25px] p-6 md:p-8" >
+                    <form onSubmit={handleSubmit} className="space-y-6" >
 
                         {/* Title */}
                         <div>
-
                             <label className="block text-sm font-medium mb-2">
                                 Blog Title
                             </label>
@@ -345,17 +326,12 @@ const BlogAdd = () => {
                                     setErrors((prev) => ({ ...prev, title: "", })
                                     );
                                 }}
-                                className={`w-full border rounded-xl px-4 py-3 outline-none 
-                                    ${errors.title ? `border-red-500` : `border-black/10`
-                                    }
-                                `}
+                                className={`w-full border rounded-xl px-4 py-3 outline-none  ${errors.title ? `border-red-500` : `border-black/10`}`}
                                 placeholder="Enter Blog Title"
                             />
 
                             {errors.title && (
-                                <p className="text-red-500 text-sm mt-2">
-                                    {errors.title}
-                                </p>
+                                <p className="text-red-500 text-sm mt-2"> {errors.title} </p>
                             )}
 
                         </div>
@@ -420,62 +396,56 @@ const BlogAdd = () => {
 
                                             {categoryOptions.map((item, index) => {
 
-                                                const isSelected =
-                                                    categories.includes(
-                                                        item
-                                                    );
+                                                // const isSelected = categories.includes(item);
+                                                const isSelected = categories.some(
+                                                    (cat) => cat.id === item.id
+                                                );
 
                                                 return (
-                                                    <button key={index} type="button"
+                                                    <button key={item.id} type="button"
                                                         onClick={() => toggleCategory(item)}
                                                         className={`flex items-center gap-2 px-4 py-2 rounded-full border transition
-                                                            ${isSelected ? `bg-[#EA3C26] border-[#EA3C26] text-white ` : `bg-[#f8f8f8] border-black/10 text-black hover:border-[#EA3C26] hover:text-[#EA3C26]`}
-                                                        `}
+                                                            ${isSelected ? "bg-[#EA3C26] border-[#EA3C26] text-white" : "bg-[#f8f8f8] border-black/10 text-black"}`}
                                                     >
-
-                                                        {item}
-                                                        {isSelected && (
-                                                            <Check size={16} />
-                                                        )}
-
+                                                        {item.name}
+                                                        {isSelected && <Check size={16} />}
                                                     </button>
                                                 );
                                             }
                                             )}
 
                                         </div>
-
                                     </div>
                                 )}
 
                             {/* Added Categories */}
-                            {categories.length >
-                                0 && (
-                                    <div className="mt-5">
+                            {categories.length > 0 && (
+                                <div className="mt-5">
 
-                                        <h4 className="text-[15px] font-medium mb-3">
-                                            Added Categories
-                                        </h4>
+                                    <h4 className="text-[15px] font-medium mb-3">
+                                        Added Categories
+                                    </h4>
 
-                                        <div className="flex flex-wrap gap-3">
+                                    <div className="flex flex-wrap gap-3">
 
-                                            {categories.map((item, index) => (
-                                                <button key={index} type="button"
-                                                    onClick={() => removeCategory(item)}
-                                                    className="flex items-center gap-2 bg-[#EA3C26]
-                                                        text-white border
-                                                        border-[#EA3C26] px-4 py-2 rounded-full transition
-                                                    "
-                                                >
-
-                                                    {item}
-                                                    <X size={16} />
-                                                </button>
-                                            )
-                                            )}
-                                        </div>
+                                        {categories.map((item) => (
+                                            <button key={item.id} type="button"
+                                                onClick={() =>
+                                                    setCategories((prev) =>
+                                                        prev.filter(
+                                                            (cat) => cat.id !== item.id
+                                                        )
+                                                    )
+                                                }
+                                                className="flex items-center gap-2 bg-[#EA3C26] text-white border border-[#EA3C26] px-4 py-2 rounded-full"
+                                            >
+                                                {item.name}
+                                                <X size={16} />
+                                            </button>
+                                        ))}
                                     </div>
-                                )}
+                                </div>
+                            )}
                         </div>
 
                         {/* Content */}
