@@ -1,30 +1,22 @@
 // Admin/Pages/Blogs/BlogAdd.jsx
 
-import React, {
-    useMemo,
-    useRef,
-    useState,
-} from "react";
+import React, { useMemo, useRef, useState, useEffect, useCallback } from "react";
 
 import { useNavigate } from "react-router-dom";
-
-import {
-    Check,
-    X,
-} from "lucide-react";
-
+import { Check, X, } from "lucide-react";
 import AdminLayout from "../../Components/Layout/AdminLayout";
 
-import BlogContents from "./BlogContents";
+// import BlogContents from "./BlogContents";
 
 import JoditEditor from "jodit-react";
+import { apiRequest, apiRequestWithFileRequest } from "../../utils/api.interceptors.js";
+import toast from "react-hot-toast";
 
 // import API_URL from "../../../Config/api";
 
 const BlogAdd = () => {
 
     const navigate = useNavigate();
-
     const editor = useRef(null);
 
     /* Input Refs */
@@ -32,178 +24,44 @@ const BlogAdd = () => {
     const imageRef = useRef(null);
     const dateRef = useRef(null);
     const categoryRef = useRef(null);
-    const authorRef = useRef(null);
-    const designationRef = useRef(null);
+    // const authorRef = useRef(null);
+    // const designationRef = useRef(null);
+    const [categoryOptions, setCategoryOptions] = useState([]);
+    const [categories, setCategories] = useState([]);
 
-    /* Local Storage Blogs */
-    const localBlogs = useMemo(() => {
-
-        return (
-            JSON.parse(
-                localStorage.getItem(
-                    "blogContents"
-                )
-            ) || []
-        );
-
-    }, []);
-
-    /* Merge Static + Dynamic Blogs */
-    const allBlogs = useMemo(() => {
-
-        return [
-            ...localBlogs,
-            ...BlogContents,
-        ];
-
-    }, [localBlogs]);
-
-    /* Category Options */
-    // const categoryOptions =
-    //     useMemo(() => {
-
-    //         const allCategories =
-    //             allBlogs.flatMap(
-    //                 (blog) => {
-
-    //                     if (
-    //                         Array.isArray(
-    //                             blog.category
-    //                         )
-    //                     ) {
-    //                         return blog.category;
-    //                     }
-
-    //                     return blog.category
-    //                         ? [
-    //                             blog.category,
-    //                         ]
-    //                         : [];
-    //                 }
-    //             );
-
-    //         return [
-    //             ...new Set(
-    //                 allCategories
-    //             ),
-    //         ];
-
-    //     }, [allBlogs]);
-    const categoryOptions =
-        JSON.parse(
-            localStorage.getItem(
-                "blogCategories"
-            )
-        )?.map(
-            (item) => item.name
-        ) || [];
     /* Editor Config */
     const config = useMemo(() => ({
         readonly: false,
-
-        placeholder:
-            "Write full blog content...",
-
+        placeholder: "Write full blog content...",
         height: 450,
-
         uploader: {
             insertImageAsBase64URI: true,
         },
-
-        buttons: [
-            "source",
-            "|",
-            "bold",
-            "italic",
-            "underline",
-            "strikethrough",
-            "|",
-            "ul",
-            "ol",
-            "|",
-            "outdent",
-            "indent",
-            "|",
-            "font",
-            "fontsize",
-            "brush",
-            "paragraph",
-            "|",
-            "image",
-            "table",
-            "link",
-            "|",
-            "align",
-            "undo",
-            "redo",
-            "|",
-            "hr",
-            "eraser",
-            "copyformat",
-            "|",
-            "fullsize",
-        ],
-
-        style: {
-            font: "16px",
-        },
+        buttons: ["source", "|", "bold", "italic", "underline", "strikethrough", "|", "ul", "ol", "|", "outdent", "indent", "|", "font", "fontsize", "brush", "paragraph", "|", "image", "table", "link", "|", "align", "undo", "redo", "|", "hr", "eraser", "copyformat", "|", "fullsize",],
+        style: { font: "16px", },
     }), []);
 
     /* Form State */
     const [form, setForm] =
         useState({
-            title: "",
-            image: null,
-            date: new Date()
-                .toISOString()
-                .slice(0, 16),
+            title: "", image_url: null,
+            date: new Date().toISOString().slice(0, 16),
             author: "",
             designation: "",
             content: "",
         });
 
-    const [categoryInput, setCategoryInput] =
-        useState("");
-
-    const [categories, setCategories] =
-        useState([]);
-
-    const [message, setMessage] =
-        useState("");
-
-    const [errors, setErrors] =
-        useState({});
+    const [categoryInput, setCategoryInput] = useState("");
+    const [message, setMessage] = useState("");
+    const [errors, setErrors] = useState({});
 
     /* Normalize Text */
-    const normalizeText = (
-        value
-    ) => {
-
-        return value
-            ?.toLowerCase()
-            .trim()
-            .replace(
-                /\s+/g,
-                " "
-            );
-    };
-
-    /* Duplicate Blog Check */
-    const isDuplicateTitle =
-        allBlogs.some(
-            (blog) =>
-                normalizeText(
-                    blog.title
-                ) ===
-                normalizeText(
-                    form.title
-                )
-        );
+    // const normalizeText = (value) => {
+    //     return value?.toLowerCase().trim().replace(/\s+/g, " ");
+    // };
 
     /* Scroll To Field */
-    const scrollToField = (
-        ref
-    ) => {
+    const scrollToField = (ref) => {
 
         if (!ref?.current) return;
 
@@ -215,414 +73,232 @@ const BlogAdd = () => {
         ref.current.focus();
     };
 
-    /* Add Category */
-    const addCategory = () => {
+    const fetchCategories = useCallback(async () => {
+        try {
+            const result = await apiRequest(
+                "/admin/category/list",
+                {
+                    method: "GET",
+                }
+            );
+            console.log(result.data);
+            if (result.status) {
+                setCategoryOptions(result.data.category);
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }, []);
 
-        const value =
-            categoryInput.trim();
+    useEffect(() => {
+        fetchCategories();
+    }, [fetchCategories]);
+
+    /* Add Category */
+
+    const addCategory = async () => {
+        const value = categoryInput.trim();
 
         if (!value) return;
 
-        const alreadyExists =
-            categories.some(
-                (cat) =>
-                    normalizeText(
-                        cat
-                    ) ===
-                    normalizeText(
-                        value
-                    )
-            );
+        const alreadyExists = categoryOptions.some(
+            (cat) =>
+                cat.name.toLowerCase() === value.toLowerCase()
+        );
 
         if (alreadyExists) {
-
             setErrors({
-                category:
-                    "Category already added.",
+                category: "Category already exists.",
             });
-
             return;
         }
 
-        setCategories([
-            ...categories,
-            value,
-        ]);
-
-        setCategoryInput("");
-
-        setErrors((prev) => ({
-            ...prev,
-            category: "",
-        }));
-    };
-
-    /* Toggle Category */
-    const toggleCategory = (
-        category
-    ) => {
-
-        const exists =
-            categories.includes(
-                category
+        try {
+            const result = await apiRequest(
+                "/admin/category/create",
+                {
+                    method: "POST",
+                    body: JSON.stringify({
+                        name: value,
+                    }),
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }
             );
 
-        if (exists) {
+            if (result.status) {
+                const newCategory = result.data.category[0];
 
-            setCategories(
-                categories.filter(
-                    (item) =>
-                        item !==
-                        category
-                )
-            );
+                // Add to category list
+                setCategoryOptions((prev) => [
+                    ...prev,
+                    newCategory,
+                ]);
 
-        } else {
+                // Auto-select category
+                setCategories((prev) => [
+                    ...prev,
+                    newCategory,
+                ]);
 
-            setCategories([
-                ...categories,
-                category,
-            ]);
+                setCategoryInput("");
+                setErrors((prev) => ({
+                    ...prev,
+                    category: "",
+                }));
+            } else {
+                setErrors({
+                    category:
+                        result.message ||
+                        "Failed to create category",
+                });
+            }
+        } catch (error) {
+            console.error(error);
+
+            setErrors({
+                category: "Something went wrong",
+            });
         }
-
-        setErrors((prev) => ({
-            ...prev,
-            category: "",
-        }));
     };
 
-    /* Remove Category */
-    const removeCategory = (
-        item
-    ) => {
-
-        setCategories(
-            categories.filter(
-                (cat) =>
-                    cat !== item
-            )
+    const toggleCategory = (category) => {
+        setCategories((prev) =>
+            prev.some((item) => item.id === category.id) ? prev.filter((item) => item.id !== category.id) : [...prev, category]
         );
     };
 
     /* Image Upload + Compress */
     const handleImage = (e) => {
 
-        const file =
-            e.target.files[0];
+        const file = e.target.files[0];
 
         if (!file) return;
 
         /* Max 2MB Validation */
-        if (
-            file.size >
-            2 * 1024 * 1024
-        ) {
+        if (file.size > 2 * 1024 * 1024) {
 
-            setErrors({
-                image:
-                    "Image size must be less than 2MB.",
-            });
-
-            scrollToField(
-                imageRef
-            );
-
+            setErrors({ image_url: "Image size must be less than 2MB.", });
+            scrollToField(imageRef);
             return;
         }
 
-        const reader =
-            new FileReader();
+        const reader = new FileReader();
 
-        reader.onload = (
-            event
-        ) => {
+        reader.onload = (event) => {
 
-            const img =
-                new Image();
+            const img = new Image();
 
-            img.src =
-                event.target.result;
+            img.src = event.target.result;
 
             img.onload = () => {
 
-                const canvas =
-                    document.createElement(
-                        "canvas"
-                    );
+                const canvas = document.createElement("canvas");
+                const maxWidth = 1200;
+                let width = img.width;
+                let height = img.height;
 
-                const maxWidth =
-                    1200;
-
-                let width =
-                    img.width;
-
-                let height =
-                    img.height;
-
-                if (
-                    width >
-                    maxWidth
-                ) {
-
-                    height =
-                        (
-                            height *
-                            maxWidth
-                        ) / width;
-
-                    width =
-                        maxWidth;
+                if (width > maxWidth) {
+                    height = (height * maxWidth) / width;
+                    width = maxWidth;
                 }
-
-                canvas.width =
-                    width;
-
-                canvas.height =
-                    height;
-
-                const ctx =
-                    canvas.getContext(
-                        "2d"
-                    );
-
-                ctx.drawImage(
-                    img,
-                    0,
-                    0,
-                    width,
-                    height
-                );
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(img, 0, 0, width, height);
 
                 /* Compress Image */
-                const compressedImage =
-                    canvas.toDataURL(
-                        "image/jpeg",
-                        0.7
-                    );
+                const compressedImage = canvas.toDataURL("image/jpeg", 0.7);
+                setForm({ ...form, image_url: compressedImage, });
 
-                setForm({
-                    ...form,
-                    image:
-                        compressedImage,
-                });
-
-                setErrors((prev) => ({
+                setForm((prev) => ({
                     ...prev,
-                    image: "",
+                    imageFile: file,
                 }));
+
+                setErrors((prev) => ({ ...prev, image_url: "", }));
             };
         };
 
-        reader.readAsDataURL(
-            file
-        );
+        reader.readAsDataURL(file);
     };
 
     /* Submit Blog */
-    const handleSubmit = (
-        e
-    ) => {
-
+    const handleSubmit = async (e) => {
         e.preventDefault();
-
         setMessage("");
-
         const newErrors = {};
 
-        if (
-            form.title.trim() ===
-            ""
-        ) {
-
-            newErrors.title =
-                "Blog title is required.";
-
-            scrollToField(
-                titleRef
-            );
+        if (form.title.trim() === "") {
+            newErrors.title = "Blog title is required.";
+            scrollToField(titleRef);
         }
-
-        else if (
-            isDuplicateTitle
-        ) {
-
-            newErrors.title =
-                "Blog is already added.";
-
-            scrollToField(
-                titleRef
-            );
+        // else if (isDuplicateTitle) {
+        //     newErrors.title = "Blog is already added.";
+        //     scrollToField(titleRef);
+        // } 
+        else if (!form.image_url) {
+            newErrors.image_url = "Blog image is required.";
+            scrollToField(imageRef);
+        } else if (form.date.trim() === "") {
+            newErrors.date = "Date & time is required.";
+            scrollToField(dateRef);
+        } else if (categories.length === 0) {
+            newErrors.category = "Please add at least one category.";
+            scrollToField(categoryRef);
+        } else if (form.content.replace(/<[^>]*>/g, "").trim() === "") {
+            newErrors.content = "Blog content is required.";
         }
+        // else if (form.author.trim() === "") {
+        //     newErrors.author = "Author name is required.";
+        //     scrollToField(authorRef);
+        // } 
+        // else if (form.designation.trim() === "") {
+        //     newErrors.designation = "Designation is required.";
+        //     scrollToField(designationRef);
+        // }
 
-        else if (
-            !form.image
-        ) {
+        setErrors(newErrors);
 
-            newErrors.image =
-                "Blog image is required.";
-
-            scrollToField(
-                imageRef
-            );
-        }
-
-        else if (
-            form.date.trim() ===
-            ""
-        ) {
-
-            newErrors.date =
-                "Date & time is required.";
-
-            scrollToField(
-                dateRef
-            );
-        }
-
-        else if (
-            categories.length ===
-            0
-        ) {
-
-            newErrors.category =
-                "Please add at least one category.";
-
-            scrollToField(
-                categoryRef
-            );
-        }
-
-        else if (
-            form.content
-                .replace(
-                    /<[^>]*>/g,
-                    ""
-                )
-                .trim() === ""
-        ) {
-
-            newErrors.content =
-                "Blog content is required.";
-        }
-
-        else if (
-            form.author.trim() ===
-            ""
-        ) {
-
-            newErrors.author =
-                "Author name is required.";
-
-            scrollToField(
-                authorRef
-            );
-        }
-
-        else if (
-            form.designation.trim() ===
-            ""
-        ) {
-
-            newErrors.designation =
-                "Designation is required.";
-
-            scrollToField(
-                designationRef
-            );
-        }
-
-        setErrors(
-            newErrors
-        );
-
-        if (
-            Object.keys(
-                newErrors
-            ).length > 0
-        ) {
+        if (Object.keys(newErrors).length > 0) {
             return;
         }
+        const category_ids = categories.map(
+            (item) => item.id
+        );
+        const formData = new FormData();
 
-        const newBlog = {
-
-            id: Date.now(),
-
-            slug: form.title
-                .toLowerCase()
-                .trim()
-                .replace(
-                    /[^\w\s-]/g,
-                    ""
-                )
-                .replace(
-                    /\s+/g,
-                    "-"
-                ),
-
-            title:
-                form.title,
-
-            image:
-                form.image,
-
-            date:
-                form.date,
-
-            category:
-                categories,
-
-            author:
-                form.author,
-
-            designation:
-                form.designation,
-
-            content:
-                form.content,
-        };
-
+        formData.append("title", form.title);
+        formData.append("image_url", form.imageFile);
+        formData.append("display_date", form.date);
+        formData.append("author", form.author);
+        formData.append("designation", form.designation);
+        formData.append("content", form.content);
+        formData.append("category_ids", category_ids.join(','));
+        // console.log(JSON.stringify(categories));
+        // console.log(category_ids.join(','));
+        // return false;
         try {
-
-            const oldBlogs =
-                JSON.parse(
-                    localStorage.getItem(
-                        "blogContents"
-                    )
-                ) || [];
-
-            oldBlogs.unshift(
-                newBlog
-            );
-
-            localStorage.setItem(
-                "blogContents",
-                JSON.stringify(
-                    oldBlogs
-                )
-            );
-
-            setMessage(
-                "Blog Added Successfully!"
-            );
-
-            setTimeout(() => {
-
-                navigate(
-                    "/admin/blogs"
-                );
-
-            }, 1000);
-
-        } catch (error) {
-
-            console.error(
-                error
-            );
-
-            setErrors({
-                storage:
-                    "Storage limit exceeded. Please delete some old blogs or use smaller images.",
+            const result = await apiRequestWithFileRequest("/admin/blog/create", {
+                method: "POST",
+                // body: JSON.stringify(newBlog),
+                body: formData,
             });
+
+            if (result.status) {
+                setMessage("Blog Added Successfully!");
+                toast.success("Blog Added successfully.");
+                setTimeout(() => {
+                    navigate("/admin/blogs");
+                }, 1000);
+            } else {
+                setErrors({ api: result.message, });
+                toast.error(result.message);
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error("Unable to create blog");
         }
     };
 
@@ -635,139 +311,45 @@ const BlogAdd = () => {
                     Add Blog
                 </h1>
 
-                <div
-                    className="
-                        bg-white
-                        border
-                        border-black/10
-                        rounded-[25px]
-                        p-6
-                        md:p-8
-                    "
-                >
-                    <form
-                        onSubmit={
-                            handleSubmit
-                        }
-                        className="space-y-6"
-                    >
+                <div className="bg-white border border-black/10 rounded-[25px] p-6 md:p-8" >
+                    <form onSubmit={handleSubmit} className="space-y-6" >
 
                         {/* Title */}
                         <div>
-
                             <label className="block text-sm font-medium mb-2">
                                 Blog Title
                             </label>
 
-                            <input
-                                ref={
-                                    titleRef
-                                }
-                                type="text"
-                                value={
-                                    form.title
-                                }
-                                onChange={(
-                                    e
-                                ) => {
-
-                                    setForm({
-                                        ...form,
-                                        title:
-                                            e.target
-                                                .value,
-                                    });
-
-                                    setErrors(
-                                        (
-                                            prev
-                                        ) => ({
-                                            ...prev,
-                                            title:
-                                                "",
-                                        })
+                            <input ref={titleRef} type="text" value={form.title}
+                                onChange={(e) => {
+                                    setForm({ ...form, title: e.target.value, });
+                                    setErrors((prev) => ({ ...prev, title: "", })
                                     );
                                 }}
-                                className={`
-                                    w-full
-                                    border
-                                    rounded-xl
-                                    px-4
-                                    py-3
-                                    outline-none
-
-                                    ${errors.title
-                                        ? `
-                                                border-red-500
-                                              `
-                                        : `
-                                                border-black/10
-                                              `
-                                    }
-                                `}
+                                className={`w-full border rounded-xl px-4 py-3 outline-none  ${errors.title ? `border-red-500` : `border-black/10`}`}
                                 placeholder="Enter Blog Title"
                             />
 
                             {errors.title && (
-                                <p className="text-red-500 text-sm mt-2">
-                                    {
-                                        errors.title
-                                    }
-                                </p>
+                                <p className="text-red-500 text-sm mt-2"> {errors.title} </p>
                             )}
 
                         </div>
 
                         {/* Image */}
                         <div>
-
                             <label className="block text-sm font-medium mb-2">
                                 Select Image
                             </label>
 
-                            <input
-                                ref={
-                                    imageRef
-                                }
-                                type="file"
-                                accept="image/*"
-                                onChange={
-                                    handleImage
-                                }
-                                className={`
-                                    w-full
-                                    border
-                                    rounded-xl
-                                    px-4
-                                    py-3
-
-                                    ${errors.image
-                                        ? `
-                                                border-red-500
-                                              `
-                                        : `
-                                                border-black/10
-                                              `
-                                    }
-                                `}
+                            <input ref={imageRef} type="file" accept="image/*" onChange={handleImage}
+                                className={`w-full border rounded-xl px-4 py-3 ${errors.image_url ? `border-red-500` : `border-black/10`}`}
                             />
 
-                            {errors.image && (
-                                <p className="text-red-500 text-sm mt-2">
-                                    {
-                                        errors.image
-                                    }
-                                </p>
-                            )}
+                            {errors.image_url && (<p className="text-red-500 text-sm mt-2"> {errors.image_url} </p>)}
 
-                            {form.image && (
-                                <img
-                                    src={
-                                        form.image
-                                    }
-                                    alt=""
-                                    className="mt-4 h-[180px] rounded-xl object-cover"
-                                />
+                            {form.image_url && (
+                                <img src={form.image_url} alt="" className="mt-4 h-[180px] rounded-xl object-cover" />
                             )}
 
                         </div>
@@ -775,120 +357,35 @@ const BlogAdd = () => {
                         {/* Date */}
                         <div>
 
-                            <label className="block text-sm font-medium mb-2">
-                                Date & Time
-                            </label>
+                            <label className="block text-sm font-medium mb-2"> Date & Time </label>
 
-                            <input
-                                ref={
-                                    dateRef
-                                }
-                                type="datetime-local"
-                                value={
-                                    form.date
-                                }
-                                onChange={(
-                                    e
-                                ) =>
-                                    setForm(
-                                        {
-                                            ...form,
-                                            date:
-                                                e
-                                                    .target
-                                                    .value,
-                                        }
-                                    )
-                                }
-                                className={`
-                                    w-full
-                                    border
-                                    rounded-xl
-                                    px-4
-                                    py-3
-
-                                    ${errors.date
-                                        ? `
-                                                border-red-500
-                                              `
-                                        : `
-                                                border-black/10
-                                              `
-                                    }
-                                `}
+                            <input ref={dateRef} type="datetime-local" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value, })}
+                                className={`w-full border rounded-xl px-4 py-3 ${errors.date ? `border-red-500` : `border-black/10`}`}
                             />
-
-                            {errors.date && (
-                                <p className="text-red-500 text-sm mt-2">
-                                    {
-                                        errors.date
-                                    }
-                                </p>
-                            )}
-
+                            {errors.date && (<p className="text-red-500 text-sm mt-2"> {errors.date} </p>)}
                         </div>
 
                         {/* Categories */}
                         <div ref={categoryRef}>
-
-                            <label className="block text-sm font-medium mb-2">
-                                Categories
-                            </label>
-
+                            <label className="block text-sm font-medium mb-2"> Categories </label>
                             <div className="flex flex-col md:flex-row gap-3">
 
-                                <input
-                                    type="text"
-                                    value={
-                                        categoryInput
-                                    }
-                                    onChange={(e) =>
-                                        setCategoryInput(
-                                            e.target.value
-                                        )
-                                    }
-                                    className={`
-                                        w-full
-                                        border
-                                        rounded-xl
-                                        px-4
-                                        py-3
-
-                                        ${errors.category
-                                            ? `
-                                                    border-red-500
-                                                  `
-                                            : `
-                                                    border-black/10
-                                                  `
-                                        }
-                                    `}
+                                <input type="text" value={categoryInput} onChange={(e) => setCategoryInput(e.target.value)}
+                                    className={`w-full border rounded-xl px-4 py-3 ${errors.category ? `border-red-500` : `border-black/10`}`}
                                     placeholder="Add New Category"
                                 />
 
-                                <button
-                                    type="button"
-                                    onClick={
-                                        addCategory
-                                    }
-                                    className="px-6 py-3 rounded-xl bg-red-600 text-white hover:bg-black transition"
-                                >
+                                <button type="button" onClick={addCategory} className="px-6 py-3 rounded-xl bg-red-600 text-white hover:bg-black transition" >
                                     Add
                                 </button>
 
                             </div>
 
-                            {errors.category && (
-                                <p className="text-red-500 text-sm mt-2">
-                                    {
-                                        errors.category
-                                    }
-                                </p>
-                            )}
+                            {errors.category && (<p className="text-red-500 text-sm mt-2"> {errors.category} </p>)}
 
                             {/* Existing Categories */}
-                            {categoryOptions.length >
-                                0 && (
+                            {
+                                categoryOptions.length > 0 && (
                                     <div className="mt-5">
 
                                         <h4 className="text-[15px] font-medium mb-3">
@@ -897,135 +394,58 @@ const BlogAdd = () => {
 
                                         <div className="flex flex-wrap gap-3">
 
-                                            {categoryOptions.map(
-                                                (
-                                                    item,
-                                                    index
-                                                ) => {
+                                            {categoryOptions.map((item, index) => {
 
-                                                    const isSelected =
-                                                        categories.includes(
-                                                            item
-                                                        );
+                                                // const isSelected = categories.includes(item);
+                                                const isSelected = categories.some(
+                                                    (cat) => cat.id === item.id
+                                                );
 
-                                                    return (
-                                                        <button
-                                                            key={
-                                                                index
-                                                            }
-                                                            type="button"
-                                                            onClick={() =>
-                                                                toggleCategory(
-                                                                    item
-                                                                )
-                                                            }
-                                                            className={`
-                                                            flex
-                                                            items-center
-                                                            gap-2
-                                                            px-4
-                                                            py-2
-                                                            rounded-full
-                                                            border
-                                                            transition
-
-                                                            ${isSelected
-                                                                    ? `
-                                                                        bg-[#EA3C26]
-                                                                        border-[#EA3C26]
-                                                                        text-white
-                                                                      `
-                                                                    : `
-                                                                        bg-[#f8f8f8]
-                                                                        border-black/10
-                                                                        text-black
-                                                                        hover:border-[#EA3C26]
-                                                                        hover:text-[#EA3C26]
-                                                                      `
-                                                                }
-                                                        `}
-                                                        >
-
-                                                            {item}
-
-                                                            {isSelected && (
-                                                                <Check
-                                                                    size={
-                                                                        16
-                                                                    }
-                                                                />
-                                                            )}
-
-                                                        </button>
-                                                    );
-                                                }
+                                                return (
+                                                    <button key={item.id} type="button"
+                                                        onClick={() => toggleCategory(item)}
+                                                        className={`flex items-center gap-2 px-4 py-2 rounded-full border transition
+                                                            ${isSelected ? "bg-[#EA3C26] border-[#EA3C26] text-white" : "bg-[#f8f8f8] border-black/10 text-black"}`}
+                                                    >
+                                                        {item.name}
+                                                        {isSelected && <Check size={16} />}
+                                                    </button>
+                                                );
+                                            }
                                             )}
 
                                         </div>
-
                                     </div>
                                 )}
 
                             {/* Added Categories */}
-                            {categories.length >
-                                0 && (
-                                    <div className="mt-5">
+                            {categories.length > 0 && (
+                                <div className="mt-5">
 
-                                        <h4 className="text-[15px] font-medium mb-3">
-                                            Added Categories
-                                        </h4>
+                                    <h4 className="text-[15px] font-medium mb-3">
+                                        Added Categories
+                                    </h4>
 
-                                        <div className="flex flex-wrap gap-3">
+                                    <div className="flex flex-wrap gap-3">
 
-                                            {categories.map(
-                                                (
-                                                    item,
-                                                    index
-                                                ) => (
-                                                    <button
-                                                        key={
-                                                            index
-                                                        }
-                                                        type="button"
-                                                        onClick={() =>
-                                                            removeCategory(
-                                                                item
-                                                            )
-                                                        }
-                                                        className="
-                                                        flex
-                                                        items-center
-                                                        gap-2
-                                                        bg-[#EA3C26]
-                                                        text-white
-                                                        border
-                                                        border-[#EA3C26]
-                                                        px-4
-                                                        py-2
-                                                        rounded-full
-                                                        transition
-                                                    "
-                                                    >
-
-                                                        {
-                                                            item
-                                                        }
-
-                                                        <X
-                                                            size={
-                                                                16
-                                                            }
-                                                        />
-
-                                                    </button>
-                                                )
-                                            )}
-
-                                        </div>
-
+                                        {categories.map((item) => (
+                                            <button key={item.id} type="button"
+                                                onClick={() =>
+                                                    setCategories((prev) =>
+                                                        prev.filter(
+                                                            (cat) => cat.id !== item.id
+                                                        )
+                                                    )
+                                                }
+                                                className="flex items-center gap-2 bg-[#EA3C26] text-white border border-[#EA3C26] px-4 py-2 rounded-full"
+                                            >
+                                                {item.name}
+                                                <X size={16} />
+                                            </button>
+                                        ))}
                                     </div>
-                                )}
-
+                                </div>
+                            )}
                         </div>
 
                         {/* Content */}
@@ -1035,190 +455,48 @@ const BlogAdd = () => {
                                 Blog Content
                             </label>
 
-                            <div
-                                className={`
-                                    border
-                                    rounded-xl
-                                    overflow-hidden
-                                    bg-white
-
-                                    ${errors.content
-                                        ? `
-                                                border-red-500
-                                              `
-                                        : `
-                                                border-black/10
-                                              `
-                                    }
-                                `}
-                            >
-
-                                <JoditEditor
-                                    ref={
-                                        editor
-                                    }
-                                    value={
-                                        form.content
-                                    }
-                                    config={
-                                        config
-                                    }
-                                    tabIndex={1}
-                                    onChange={(
-                                        newContent
-                                    ) =>
-                                        setForm({
-                                            ...form,
-                                            content:
-                                                newContent,
-                                        })
-                                    }
-                                />
-
+                            <div className={`border rounded-xl overflow-hidden bg-white ${errors.content ? `border-red-500` : `border-black/10`}`} >
+                                <JoditEditor ref={editor} value={form.content} config={config} tabIndex={1} onChange={(newContent) => setForm({ ...form, content: newContent, })} />
                             </div>
 
-                            {errors.content && (
-                                <p className="text-red-500 text-sm mt-2">
-                                    {
-                                        errors.content
-                                    }
-                                </p>
-                            )}
+                            {errors.content && (<p className="text-red-500 text-sm mt-2"> {errors.content}</p>)}
 
                         </div>
 
                         {/* Author */}
                         <div className="grid md:grid-cols-2 gap-6">
 
-                            <div>
+                            {/*   <div>
 
                                 <label className="block text-sm font-medium mb-2">
                                     Author Name
                                 </label>
 
-                                <input
-                                    ref={
-                                        authorRef
-                                    }
-                                    type="text"
-                                    value={
-                                        form.author
-                                    }
-                                    onChange={(
-                                        e
-                                    ) =>
-                                        setForm(
-                                            {
-                                                ...form,
-                                                author:
-                                                    e
-                                                        .target
-                                                        .value,
-                                            }
-                                        )
-                                    }
-                                    className={`
-                                        w-full
-                                        border
-                                        rounded-xl
-                                        px-4
-                                        py-3
-
-                                        ${errors.author
-                                            ? `
-                                                    border-red-500
-                                                  `
-                                            : `
-                                                    border-black/10
-                                                  `
-                                        }
-                                    `}
-                                    placeholder="Enter Name"
+                                <input ref={authorRef} type="text" value={form.author} onChange={(e) => setForm({ ...form, author: e.target.value, })}
+                                    className={` w-full border rounded-xl px-4 py-3 ${errors.author ? `border-red-500` : `border-black/10 `} `} placeholder="Enter Name"
                                 />
 
-                                {errors.author && (
-                                    <p className="text-red-500 text-sm mt-2">
-                                        {
-                                            errors.author
-                                        }
-                                    </p>
-                                )}
+                                {errors.author && (<p className="text-red-500 text-sm mt-2"> {errors.author}</p>)}
 
-                            </div>
+                            </div> */}
 
-                            <div>
+                            {/*   <div>
 
-                                <label className="block text-sm font-medium mb-2">
-                                    Designation
-                                </label>
-
-                                <input
-                                    ref={
-                                        designationRef
-                                    }
-                                    type="text"
-                                    value={
-                                        form.designation
-                                    }
-                                    onChange={(
-                                        e
-                                    ) =>
-                                        setForm(
-                                            {
-                                                ...form,
-                                                designation:
-                                                    e
-                                                        .target
-                                                        .value,
-                                            }
-                                        )
-                                    }
-                                    className={`
-                                        w-full
-                                        border
-                                        rounded-xl
-                                        px-4
-                                        py-3
-
-                                        ${errors.designation
-                                            ? `
-                                                    border-red-500
-                                                  `
-                                            : `
-                                                    border-black/10
-                                                  `
-                                        }
-                                    `}
+                                <label className="block text-sm font-medium mb-2"> Designation </label>
+                                <input ref={designationRef} type="text" value={form.designation}
+                                    onChange={(e) => setForm({ ...form, designation: e.target.value, })}
+                                    className={`w-full border rounded-xl px-4 py-3 ${errors.designation ? `border-red-500` : `border-black/10`}`}
                                     placeholder="Enter Designation"
                                 />
-
-                                {errors.designation && (
-                                    <p className="text-red-500 text-sm mt-2">
-                                        {
-                                            errors.designation
-                                        }
-                                    </p>
-                                )}
-
-                            </div>
-
+                                {errors.designation && (<p className="text-red-500 text-sm mt-2"> {errors.designation} </p>)}
+                            </div> */}
                         </div>
 
                         {/* Storage Error */}
-                        {errors.storage && (
-                            <p className="text-red-500 font-medium">
-                                {
-                                    errors.storage
-                                }
-                            </p>
-                        )}
+                        {errors.storage && (<p className="text-red-500 font-medium"> {errors.storage} </p>)}
 
                         {/* Success */}
-                        {message && (
-                            <p className="text-green-600 font-medium">
-                                {message}
-                            </p>
-                        )}
+                        {message && (<p className="text-green-600 font-medium"> {message}</p>)}
 
                         {/* Submit */}
                         <button className="w-full md:w-auto px-8 py-3 bg-red-600 text-white rounded-full font-medium hover:bg-black transition">
