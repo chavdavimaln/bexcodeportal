@@ -20,7 +20,7 @@ export const apiRequest = async ( endpoint, options = {} ) => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
 
-        window.location.href = "/login";
+        window.location.href = "/admin/login";
 
         return;
     }
@@ -48,7 +48,7 @@ export const apiRequestWithFileRequest = async ( endpoint, options = {} ) => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
 
-        window.location.href = "/login";
+        window.location.href = "/admin/login";
 
         return;
     }

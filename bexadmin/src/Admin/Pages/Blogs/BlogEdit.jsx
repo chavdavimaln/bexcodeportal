@@ -2,9 +2,9 @@ import React, { useEffect, useState, useMemo, useRef, } from "react";
 
 import { useNavigate, useParams, } from "react-router-dom";
 import AdminLayout from "../../Components/Layout/AdminLayout";
-import { API_URL } from "../../../Config/api";
 import JoditEditor from "jodit-react";
 import { apiRequest, apiRequestWithFileRequest } from "../../utils/api.interceptors.js";
+import toast from "react-hot-toast";
 
 const BlogEdit = () => {
     const { id } = useParams();
@@ -58,17 +58,6 @@ const BlogEdit = () => {
                             ? blog.category_ids.split(",").map(id => parseInt(id, 10))
                             : []
                     );
-
-
-                    // setTimeout(() => {
-                    //     console.log(blog);
-                    //     console.log(categoryOptions);
-                    // }, 3000);
-                    // setSelectedCategoryIds(
-                    //     blog.category_ids
-                    //         ? blog.category_ids.split(",").map(Number)
-                    //         : []
-                    // );
                 }
             } catch (error) {
                 console.error(error);
@@ -141,7 +130,7 @@ const BlogEdit = () => {
         }
 
         try {
-            const token = localStorage.getItem("token");
+            // const token = localStorage.getItem("token");
             const formData = new FormData();
 
             formData.append("title", form.title);
@@ -154,9 +143,6 @@ const BlogEdit = () => {
             if (imageFile) {
                 formData.append("image_url", imageFile);
             }
-            // console.log(form);
-            // console.log(selectedCategoryIds.join(","));
-            // return false;
             const result = await apiRequestWithFileRequest(`/admin/blog/update/${id}`, {
                 method: "PUT",
                 body: formData,
@@ -164,17 +150,19 @@ const BlogEdit = () => {
 
             if (result.status) {
                 setMessage("Blog updated successfully");
-
+                toast.success("Blog updated successfully.");
                 setTimeout(() => {
                     navigate("/admin/blogs");
                 }, 1000);
 
             } else {
-                alert(result.message);
+                // alert(result.message);
+                toast.error(result.message);
             }
         } catch (error) {
             console.error(error);
-            alert("Unable to update blog");
+            // alert("Unable to update blog");
+            toast.error("Unable to update blog");
         }
     };
 

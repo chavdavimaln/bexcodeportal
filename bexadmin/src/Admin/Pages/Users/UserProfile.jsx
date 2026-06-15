@@ -39,18 +39,8 @@ const UserProfile = () => {
 
                     <div className="flex flex-col md:flex-row gap-8">
 
-                        <img
-                            src={
-                                loggedUser.profile
-                            }
-                            alt=""
-                            className="
-                                w-[180px]
-                                h-[180px]
-                                rounded-3xl
-                                object-cover
-                            "
-                        />
+                        {/* <img src={ loggedUser.profile } alt="" className=" w-[180px] h-[180px] rounded-3xl object-cover"
+                        /> */}
 
                         <div className="space-y-4">
 

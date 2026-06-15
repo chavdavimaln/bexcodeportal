@@ -1,8 +1,4 @@
-import {
-    Routes,
-    Route,
-    Navigate,
-} from "react-router-dom";
+import { Routes, Route, Navigate, } from "react-router-dom";
 
 import HomeIndex from "./Admin/Pages/Home/HomeIndex";
 
@@ -16,18 +12,22 @@ import BlogList from "./Admin/Pages/Blogs/BlogList";
 import BlogEdit from "./Admin/Pages/Blogs/BlogEdit";
 import Categories from "./Admin/Pages/Blogs/Categories";
 
-import BlogView from
-    "./Admin/Pages/Blogs/BlogView";
+import BlogView from "./Admin/Pages/Blogs/BlogView";
 
 import UserList from "./Admin/Pages/Users/UserList";
 import UserAdd from "./Admin/Pages/Users/UserAdd";
 import UserEdit from "./Admin/Pages/Users/UserEdit";
 import UserProfile from "./Admin/Pages/Users/UserProfile";
-
+import { Toaster } from "react-hot-toast";
 
 function App() {
 
     return (
+         <>
+        <Toaster
+                position="top-right"
+                reverseOrder={false}
+            />
         <Routes>
 
             <Route
@@ -106,6 +106,7 @@ function App() {
                 element={<Categories />}
             />
         </Routes>
+        </>
     );
 }
 

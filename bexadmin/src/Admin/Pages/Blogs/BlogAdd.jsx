@@ -10,6 +10,7 @@ import AdminLayout from "../../Components/Layout/AdminLayout";
 
 import JoditEditor from "jodit-react";
 import { apiRequest, apiRequestWithFileRequest } from "../../utils/api.interceptors.js";
+import toast from "react-hot-toast";
 
 // import API_URL from "../../../Config/api";
 
@@ -287,15 +288,17 @@ const BlogAdd = () => {
 
             if (result.status) {
                 setMessage("Blog Added Successfully!");
-
+                toast.success("Blog Added successfully.");
                 setTimeout(() => {
                     navigate("/admin/blogs");
                 }, 1000);
             } else {
                 setErrors({ api: result.message, });
+                toast.error(result.message);
             }
         } catch (error) {
             console.error(error);
+            toast.error("Unable to create blog");
         }
     };
 

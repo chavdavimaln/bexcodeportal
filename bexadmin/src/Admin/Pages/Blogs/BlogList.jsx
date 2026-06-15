@@ -6,6 +6,8 @@ import { Pencil, Trash2, ExternalLink, } from "lucide-react";
 
 import AdminLayout from "../../Components/Layout/AdminLayout";
 import { apiRequest } from "../../utils/api.interceptors.js";
+import toast from "react-hot-toast";
+import Swal from "sweetalert2";
 
 const BlogList = () => {
 
@@ -32,9 +34,25 @@ const BlogList = () => {
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm("Delete this blog?")) {
+
+        const confirm = await Swal.fire({
+            title: "Delete this blog?",
+            text: "Are you sure, it cannot be undone.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#ef4444",
+            cancelButtonColor: "#6b7280",
+            confirmButtonText: "Yes, Delete",
+            cancelButtonText: "Cancel",
+        });
+
+        if (!confirm.isConfirmed) {
             return;
         }
+
+        // if (!window.confirm("Delete this blog?")) {
+        //     return;
+        // }
 
         try {
             const result = await apiRequest(`/admin/blog/delete/${id}`,
@@ -44,17 +62,17 @@ const BlogList = () => {
             );
 
             if (result?.status) {
-                alert("Blog deleted successfully.");
+                toast.success("Blog deleted successfully.");
+                // alert("Blog deleted successfully.");
                 fetchBlogs();
             } else {
-                alert(
-                    result?.message ||
-                    "Failed to delete blog."
-                );
+                // alert( result?.message || "Failed to delete blog." );
+                toast.error(result?.message || "Failed to delete blog.");
             }
         } catch (error) {
             console.error(error);
-            alert("Something went wrong.");
+            // alert("Something went wrong.");
+            toast.error("Something went wrong");
         }
     };
 

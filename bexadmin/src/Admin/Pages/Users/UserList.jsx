@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from "react";
 import AdminLayout from "../../Components/Layout/AdminLayout";
-import { API_URL } from "../../../Config/api";
-import {
-    Eye,
-    Pencil,
-    Trash2,
-} from "lucide-react";
-import {
-    Link,
-} from "react-router-dom";
+// import { API_URL } from "../../../Config/api";
+import { Eye, Pencil, Trash2, } from "lucide-react";
+import { Link, } from "react-router-dom";
+import { apiRequest } from "../../utils/api.interceptors.js";
+import toast from "react-hot-toast";
+import Swal from "sweetalert2";
 
 const UserList = () => {
     const [users, setUsers] = useState([]);
@@ -20,22 +17,11 @@ const UserList = () => {
 
     const fetchUsers = async () => {
         try {
-            const token = localStorage.getItem("token");
-
-            const response = await fetch(
-                `${API_URL}/admin/auth/list`,
+            const result = await apiRequest("/admin/auth/list",
                 {
                     method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
                 }
             );
-
-            const result = await response.json();
-
-            console.log("Users API Response:", result);
 
             if (result.status) {
                 setUsers(result.data || []);
@@ -46,29 +32,52 @@ const UserList = () => {
             setLoading(false);
         }
     };
-    const handleDelete = (id) => {
 
-        const confirmDelete =
-            window.confirm(
-                "Delete this user?"
+    const handleDelete = async (id) => {
+
+        const confirm = await Swal.fire({
+            title: "Delete this user?",
+            text: "Are you sure, it cannot be undone.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#ef4444",
+            cancelButtonColor: "#6b7280",
+            confirmButtonText: "Yes, Delete",
+            cancelButtonText: "Cancel",
+        });
+
+        if (!confirm.isConfirmed) {
+            return;
+        }
+        // const confirmDelete = window.confirm("Delete this user?");
+        // if (!confirmDelete) {
+        //     return;
+        // }
+
+        try {
+            const result = await apiRequest(`/admin/auth/delete/${id}`,
+                {
+                    method: "DELETE",
+                }
             );
 
-        if (!confirmDelete) return;
-
-        const updatedUsers =
-            users.filter(
-                (item) =>
-                    item.id !== id
-            );
-
-        localStorage.setItem(
-            "users",
-            JSON.stringify(
-                updatedUsers
-            )
-        );
-
-        setUsers(updatedUsers);
+            if (result.status) {
+                // alert(result.message || "User deleted successfully.");
+                toast.success(result.message || "User deleted successfully.");
+                setUsers((prev) =>
+                    prev.filter(
+                        (item) => item.id !== id
+                    )
+                );
+            } else {
+                // alert(result.message || "Delete failed.");
+                toast.error(result.message || "Delete failed.");
+            }
+        } catch (error) {
+            // console.error(error);
+            toast.error("Something went wrong.");
+            // alert("Something went wrong.");
+        }
     };
     return (
         <AdminLayout>
@@ -91,7 +100,7 @@ const UserList = () => {
                             <tr>
                                 <th className="p-3 text-left">ID</th>
                                 <th className="p-3 text-left">Name</th>
-                                <th className="p-3 text-left">Username</th>
+                                {/* <th className="p-3 text-left">Username</th> */}
                                 <th className="p-3 text-left">Email</th>
                                 <th className="p-3 text-left">Phone</th>
                                 <th className="p-3 text-left">Role</th>
@@ -104,130 +113,53 @@ const UserList = () => {
                         <tbody>
                             {loading ? (
                                 <tr>
-                                    <td
-                                        colSpan="8"
-                                        className="text-center p-5"
-                                    >
+                                    <td colSpan="8" className="text-center p-5" >
                                         Loading...
                                     </td>
                                 </tr>
                             ) : users.length > 0 ? (
                                 users.map((user) => (
-                                    <tr
-                                        key={user.id}
-                                        className="border-t"
-                                    >
-                                        <td className="p-3">
-                                            {user.id}
-                                        </td>
-
-                                        <td className="p-3">
-                                            {user.fname} {user.lname}
-                                        </td>
-
-                                        <td className="p-3">
+                                    <tr key={user.id} className="border-t" >
+                                        <td className="p-3"> {user.id}</td>
+                                        <td className="p-3"> {user.fname} {user.lname} </td>
+                                        {/* <td className="p-3">
                                             {user.username}
-                                        </td>
-
+                                        </td> */}
+                                        <td className="p-3"> {user.email} </td>
+                                        <td className="p-3"> {user.phone || "-"} </td>
+                                        <td className="p-3"> {user.role} </td>
                                         <td className="p-3">
-                                            {user.email}
-                                        </td>
-
-                                        <td className="p-3">
-                                            {user.phone || "-"}
-                                        </td>
-
-                                        <td className="p-3">
-                                            {user.role}
-                                        </td>
-
-                                        <td className="p-3">
-                                            <span
-                                                className={`px-2 py-1 rounded text-xs ${user.user_status === "active"
-                                                    ? "bg-green-100 text-green-700"
-                                                    : "bg-yellow-100 text-yellow-700"
-                                                    }`}
-                                            >
+                                            <span className={`px-2 py-1 rounded text-xs ${user.user_status === "active" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`} >
                                                 {user.user_status || "Inactive"}
                                             </span>
                                         </td>
 
-                                        <td className="p-3">
-                                            {new Date(
-                                                user.created_at
-                                            ).toLocaleDateString()}
-                                        </td>
+                                        <td className="p-3"> {new Date(user.created_at).toLocaleDateString()} </td>
                                         <td className="p-3">
                                             <div className="flex items-center gap-2">
-
-                                                <Link
-                                                    to={`/admin/users/profile/${user.id}`}
-                                                    className="
-                                                                w-8
-                                                                h-8
-                                                                rounded-lg
-                                                                bg-blue-50
-                                                                text-blue-600
-                                                                flex
-                                                                items-center
-                                                                justify-center
-                                                                hover:bg-blue-600
-                                                                hover:text-white
-                                                                transition
-                                                            "
-                                                    title="View"
-                                                >
+                                                {/* <Link to={`/admin/users/profile/${user.id}`} className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition" title="View" >
                                                     <Eye size={14} />
-                                                </Link>
-
-                                                <Link
-                                                    to={`/admin/users/edit/${user.id}`}
-                                                    className="
-                                                                w-8
-                                                                h-8
-                                                                rounded-lg
-                                                                bg-black
-                                                                text-white
-                                                                flex
-                                                                items-center
-                                                                justify-center
-                                                                hover:bg-gray-700
-                                                                transition
-                                                            "
+                                                </Link> */}
+                                                <Link to={`/admin/users/edit/${user.id}`}
+                                                    className=" w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center hover:bg-gray-700 transition"
                                                     title="Edit"
                                                 >
                                                     <Pencil size={14} />
                                                 </Link>
-
                                                 <button
                                                     onClick={() => handleDelete(user.id)}
-                                                    className="
-                                                                w-8
-                                                                h-8
-                                                                rounded-lg
-                                                                bg-red-600
-                                                                text-white
-                                                                flex
-                                                                items-center
-                                                                justify-center
-                                                                hover:bg-red-700
-                                                                transition
-                                                            "
+                                                    className="w-8 h-8 rounded-lg bg-red-600 text-white flex items-center justify-center hover:bg-red-700 transition"
                                                     title="Delete"
                                                 >
                                                     <Trash2 size={14} />
                                                 </button>
-
                                             </div>
                                         </td>
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td
-                                        colSpan="8"
-                                        className="text-center p-5"
-                                    >
+                                    <td colSpan="8" className="text-center p-5" >
                                         No Users Found
                                     </td>
                                 </tr>
